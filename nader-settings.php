@@ -1,0 +1,551 @@
+<?php
+/**
+ * Plugin Name: Nader Settings Framework
+ * Description: چارچوبی قدرتمند برای مدیریت تنظیمات وردپرس.
+ * Version: 1.0.0
+ * Author: Your Name
+ * Text Domain: nader-settings
+ * Domain Path: /languages
+ */
+
+if (!defined('ABSPATH'))
+    exit; // اگر مستقیماً فراخوانی شده، خارج شو.
+
+final class Nader_Settings{
+
+    private static $instance;
+
+    public static $settings_key = 'nader_settings'; // کلید ذخیره‌سازی تنظیمات در wp_options
+    private $settings_data = [];                    // کش برای نگهداری تنظیمات بارگذاری شده
+    private $loaded_module_classes = [];            // نگهداری لیست نام کلاس‌های ماژول بارگذاری شده
+    private $registered_module_configs = [];        // <-- جدید: نگهداری پیکربندی‌های ماژول ثبت شده از تب‌ها
+    public $tabs = [];                              // نگهداری اطلاعات تب‌های ثبت شده
+    public $current_tab_id;                         // شناسه تب فعال فعلی
+
+    /**
+     * متد Singleton برای دریافت نمونه کلاس.
+     */
+    public static function instance()
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
+            self::$instance->init();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * مقداردهی اولیه پلاگین.
+     */
+    private function init()
+    {
+        $this->constants();
+        $this->includes();
+        $this->load_module_classes(); // <-- تغییر نام: فقط کلاس‌ها را بارگذاری کن، نمونه‌سازی نکن
+        $this->load_tabs();           // بارگذاری فایل‌های تب (این‌ها پیکربندی ماژول‌ها را ثبت می‌کنند)
+        $this->hooks();               // ثبت هوک‌های وردپرس
+        $this->load_settings();       // بارگذاری تنظیمات ذخیره شده
+    }
+
+    /**
+     * تعریف ثابت‌های پلاگین.
+     */
+    private function constants()
+    {
+        if (!defined('NAD_SETTINGS_PATH')) {
+            define('NAD_SETTINGS_PATH', plugin_dir_path(__FILE__));
+        }
+        if (!defined('NAD_SETTINGS_URL')) {
+            define('NAD_SETTINGS_URL', plugin_dir_url(__FILE__));
+        }
+        if (!defined('NAD_SETTINGS_VERSION')) {
+            define('NAD_SETTINGS_VERSION', '1.0.0');
+        }
+    }
+
+    /**
+     * شامل کردن فایل‌های اصلی پلاگین.
+     */
+    private function includes()
+    {
+        // شامل کردن کلاس پایه ماژول. فایل‌های ماژول‌های خاص توسط load_module_classes شامل می‌شوند.
+        require_once NAD_SETTINGS_PATH . 'includes/class-nader-module.php';
+        // سایر فایل‌های اصلی اینجا شامل می‌شوند اگر نیاز باشد.
+        require_once NAD_SETTINGS_PATH . 'includes/choose-search.php';
+
+    }
+
+    /**
+     * بارگذاری فایل‌های کلاس ماژول.
+     * کلاس‌ها در حافظه در دسترس قرار می‌گیرند، اما نمونه‌سازی نمی‌شوند.
+     * اصلاح شد تا نام کلاس را به درستی از نام فایل استخراج کند.
+     */
+    private function load_module_classes()
+    { // <-- تغییر نام متد
+        $modules_dir = NAD_SETTINGS_PATH . 'modules/';
+        if (!is_dir($modules_dir)) {
+            error_log('Nader Settings: پوشه modules یافت نشد: ' . $modules_dir);
+            return; // اگر پوشه modules وجود نداشت، کاری انجام نده.
+        }
+        // شامل کردن هر فایل در پوشه modules
+        foreach (glob($modules_dir . '*.php') as $module_file) {
+            require_once $module_file; // استفاده از require_once برای کلاس‌های ضروری
+
+            // --- منطق صحیح ساخت نام کلاس از نام فایل ---
+            $file_name_without_ext = basename($module_file, '.php');
+            // اگر نام فایل از قبل با 'Nader_' شروع شده، همان را به عنوان نام کلاس در نظر بگیر.
+            if (strpos($file_name_without_ext, 'Nader_') === 0) {
+                $class_name = $file_name_without_ext;
+            } else {
+                // در غیر این صورت، نام فایل را به فرمت CamelCase تبدیل کرده و 'Nader_' را اضافه کن.
+                // مثال: 'text' -> 'Nader_Text', 'my-field' -> 'Nader_MyField'
+                $class_name = 'Nader_' . str_replace(' ', '', ucwords(str_replace([
+                        '-',
+                        '_'
+                    ], ' ', $file_name_without_ext)));
+            }
+            // -----------------------------------------------------
+
+            // بررسی اینکه آیا کلاس وجود دارد و از کلاس پایه Nader_Module ارث می‌برد
+            if (class_exists($class_name) && is_subclass_of($class_name, 'Nader_Module')) {
+                // فقط نام کلاس را ذخیره می‌کنیم، نه نمونه کلاس را
+                $this->loaded_module_classes[$module_file] = $class_name; // ذخیره با کلید نام فایل برای ردیابی
+                // می‌توانید نام اصلی ماژول را هم استخراج و ذخیره کنید اگر نیاز باشد
+            } else {
+                // ثبت خطا اگر کلاس یافت نشد یا از Nader_Module ارث نبرده است
+                error_log("Nader Settings: قادر به بارگذاری کلاس ماژول از فایل " . $module_file . ". کلاس مورد انتظار " . $class_name . " وجود ندارد یا از Nader_Module ارث نمی‌برد.");
+            }
+        }
+        // آرایه this->modules دیگر در اینجا پر نمی‌شود.
+    }
+
+    /**
+     * دریافت نام کلاس ماژول بر اساس نام فایل.
+     *
+     * @param string $module_file_path مسیر کامل فایل ماژول.
+     * @return string|null نام کلاس ماژول یا null.
+     */
+    public function get_module_class_name_from_file(string $module_file_path): ?string
+    {
+        return $this->loaded_module_classes[$module_file_path] ?? null;
+    }
+
+
+    /**
+     * بارگذاری فایل‌های تعریف تب از پوشه 'tabs/'.
+     * هر فایل تب انتظار می‌رود که متد register_tab() و register_module_config() را فراخوانی کند.
+     */
+    private function load_tabs()
+    {
+        $tabs_dir = NAD_SETTINGS_PATH . 'tabs/';
+        if (!is_dir($tabs_dir)) {
+            error_log('Nader Settings: پوشه tabs یافت نشد: ' . $tabs_dir);
+            return; // اگر پوشه tabs وجود نداشت، کاری انجام نده.
+        }
+        // شامل کردن هر فایل در پوشه tabs. انتظار می‌رود هر فایل register_tab() و register_module_config() را فراخوانی کند.
+        foreach (glob($tabs_dir . '*.php') as $tab_file) {
+            include_once $tab_file;
+        }
+        // تب‌ها در متد register_tab مرتب می‌شوند.
+    }
+
+    /**
+     * ثبت یک تب تنظیمات.
+     * قرار است از فایل‌های داخل پوشه 'tabs/' فراخوانی شود.
+     *
+     * @param array $tab_args آرگومان‌های تب: id (الزامی), title (الزامی), icon, order.
+     */
+    public function register_tab(array $tab_args)
+    {
+        // بررسی حداقل آرگومان‌های لازم
+        if (empty($tab_args['id']) || empty($tab_args['title'])) {
+            error_log('Nader Settings: تلاش برای ثبت تب با آرگومان‌های نامعتبر.');
+            return;
+        }
+        // ادغام آرگومان‌های ورودی با آرگومان‌های پیش‌فرض و ذخیره تب
+        $this->tabs[$tab_args['id']] = wp_parse_args($tab_args, [
+            'id'    => '',
+            'title' => '',
+            'icon'  => '',
+            'order' => 99 // ترتیب پیش‌فرض
+        ]);
+        // مرتب‌سازی تب‌ها پس از اضافه کردن برای حفظ ترتیب
+        uasort($this->tabs, function($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
+    }
+
+    /**
+     * جدید: ثبت پیکربندی یک ماژول (فیلد تنظیمات).
+     * قرار است از فایل‌های داخل پوشه 'tabs/' فراخوانی شود.
+     * این متد پیکربندی فیلد (مثل نام، عنوان، نوع، الزامی بودن، چندزبانه بودن) را ذخیره می‌کند.
+     *
+     * @param array $module_args آرگومان‌های ماژول (شامل 'name', 'type').
+     */
+    public function register_module_config(array $module_args)
+    {
+        if (empty($module_args['name']) || empty($module_args['type'])) {
+            error_log('Nader Settings: تلاش برای ثبت پیکربندی ماژول بدون نام یا نوع.');
+            return;
+        }
+        // ذخیره آرگومان‌های ماژول با نام به عنوان کلید
+        $this->registered_module_configs[$module_args['name']] = $module_args;
+    }
+
+    /**
+     * جدید: دریافت پیکربندی یک ماژول بر اساس نام آن.
+     *
+     * @param string $name نام اصلی ماژول.
+     * @return array|null پیکربندی ماژول یا null.
+     */
+    public function get_module_config(string $name): ?array
+    {
+        return $this->registered_module_configs[$name] ?? null;
+    }
+
+
+    /**
+     * ثبت هوک‌های اکشن و فیلتر وردپرس.
+     */
+    private function hooks()
+    {
+        add_action('admin_menu', [$this, 'add_admin_menu']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+        add_action('wp_ajax_nader_save_settings', [$this, 'save_settings']);
+        add_action('wp_ajax_nader_reset_settings', [$this, 'reset_settings']);
+        // اکشن‌ها و فیلترهای دیگر اینجا ثبت می‌شوند.
+    }
+
+    /**
+     * بارگذاری تنظیمات ذخیره شده از جدول wp_options.
+     * این کار یک بار در طول init انجام می‌شود.
+     */
+    private function load_settings()
+    {
+        $this->settings_data = get_option(self::$settings_key, []);
+        //        error_log('Nader Settings Load: داده‌های بارگذاری شده از پایگاه داده -> ' . print_r($this->settings_data, true)); // لاگ برای عیب‌یابی
+    }
+
+    /**
+     * اضافه کردن صفحه تنظیمات به منوی مدیریت وردپرس.
+     */
+    public function add_admin_menu()
+    {
+        add_menu_page(
+            'تنظیمات نادر',                  // عنوان صفحه در <title>
+            'تنظیمات نادر',                  // متن منو در نوار کناری
+            'manage_options',                // قابلیت مورد نیاز برای دسترسی
+            'nader-settings',                // شناسه منحصر به فرد منو
+            [$this, 'render_settings_page'], // تابع کال‌بک برای نمایش محتوای صفحه
+            'dashicons-admin-settings',      // کلاس آیکون Dashicons
+            80 // موقعیت در ترتیب منو
+        );
+    }
+
+
+    /**
+     * صف‌بندی اسکریپت‌ها و استایل‌ها برای صفحه تنظیمات مدیریت.
+     * این متد بر روی هوک 'admin_enqueue_scripts' فراخوانی می‌شود.
+     *
+     * @param string $hook هوک صفحه مدیریت فعلی.
+     */
+    public function enqueue_assets($hook) {
+        // فقط در صفحه تنظیمات افزونه دارایی‌ها را بارگذاری کن
+        // 'toplevel_page_nader-settings' نام صفحه تنظیمات ما است که هنگام add_menu_page تعریف شد.
+        if ($hook !== 'toplevel_page_nader-settings') {
+            return;
+        }
+
+        wp_enqueue_style('nader-settings-admin-css', NAD_SETTINGS_URL . 'assets/css/admin.css', [], NAD_SETTINGS_VERSION);
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_style('nader-select2-css', NAD_SETTINGS_URL . 'assets/select2/select2.min.css', [], '4.0.3');
+        wp_enqueue_style('thickbox');
+        wp_enqueue_script('wp-color-picker');
+        wp_enqueue_script('nader-select2', NAD_SETTINGS_URL . 'assets/select2/select2.min.js', ['jquery'], '4.0.3', true);
+        wp_enqueue_script('sortablejs', NAD_SETTINGS_URL . 'assets/js/Sortable.min.js', [], '1.15.0', true);
+        wp_enqueue_script('media-upload');
+        wp_enqueue_script('thickbox');
+        wp_enqueue_script('wp-editor');
+
+        // اسکریپت اصلی مدیریت پلاگین شما
+        // این اسکریپت باید پس از تمام وابستگی‌هایش (jQuery, Color Picker, Select2, SortableJS, Media Upload, WP Editor) بارگذاری شود.
+        wp_enqueue_script(
+            'nader-settings-admin', // Handle سفارشی
+            NAD_SETTINGS_URL . 'assets/js/admin.js',
+            [
+                'jquery',           // نیاز عمومی به jQuery
+                'wp-color-picker',  // برای ماژول Color
+                'nader-select2',    // برای ماژول Choose
+                'sortablejs',       // برای ماژول Repeater (جابجایی)
+                'media-upload',     // برای ماژول Image و Gallery (مدال وردپرس)
+                'thickbox',         // برای مدال Media Library
+                'wp-editor',        // برای ماژول WP Editor (API)
+                'wp-util',          // ممکن است برای برخی توابع وردپرس (مانند wp.template) لازم باشد، اختیاری اما توصیه می‌شود.
+            ],
+            NAD_SETTINGS_VERSION, // نسخه برای کش
+            true // بارگذاری در فوتر (توصیه می‌شود)
+        );
+
+        // محلی‌سازی اسکریپت اصلی با داده‌های لازم برای AJAX و UI
+        // این باید بعد از wp_enqueue_script برای 'nader-settings-admin' باشد.
+        wp_localize_script(
+            'nader-settings-admin',
+            'naderSettings', // نام شیء JS در فرانت‌اند (مثال: naderSettings.ajaxurl)
+            [
+                'ajaxurl'          => admin_url('admin-ajax.php'), // آدرس endpoint ایجکس وردپرس
+                'nonce'            => wp_create_nonce('nader_settings_nonce'), // Nonce برای امنیت
+                'active_languages' => $this->get_active_languages(), // لیست زبان‌های فعال (برای Repeater چندزبانه و ...)
+                'confirm_reset'    => 'آیا مطمئنید می‌خواهید تمام تنظیمات را بازنشانی کنید؟ این عمل قابل بازگشت نیست.', // پیام تایید بازنشانی
+                'saving_text'      => 'در حال ذخیره...', // متن دکمه ذخیره هنگام ذخیره‌سازی
+                'saved_text'       => 'ذخیره شد', // متن دکمه ذخیره پس از ذخیره‌سازی
+                'save_text'        => 'ذخیره تغییرات', // متن پیش‌فرض دکمه ذخیره
+                'validation_error_message' => 'خطا در اعتبارسنجی فیلدها. لطفا موارد مشخص شده را بررسی کنید.', // پیام کلی خطای اعتبارسنجی
+                'save_success_message' => 'تنظیمات با موفقیت ذخیره شد.', // پیام موفقیت ذخیره‌سازی
+                'reset_success_message' => 'تنظیمات با موفقیت بازنشانی شد.', // پیام موفقیت بازنشانی
+            ]
+        );
+
+        // --- بارگذاری دارایی‌های مخصوص ماژول ---
+        // این اکشن به ماژول‌ها اجازه می‌دهد دارایی‌های خاص خود را صف‌بندی کنند
+        // (اگرچه اکثر دارایی‌های عمومی در بالا صف‌بندی شده‌اند).
+        // این اکشن را در کلاس پایه Nader_Module (اگر نیاز به صف‌بندی عمومی برای همه ماژول‌ها باشد)
+        // یا در فایل هر ماژول خاص (اگر دارایی‌ها مختص آن ماژول باشد) هوک کنید.
+        do_action('nader_settings_enqueue_module_assets', $this->current_tab_id, $this);
+    }
+
+    /**
+     * رندر کردن HTML صفحه تنظیمات اصلی.
+     */
+    public function render_settings_page()
+    {
+        // تعیین تب فعلی بر اساس پارامتر 'tab' در URL یا پیش‌فرض به اولین تب
+        $this->current_tab_id = $_GET['tab'] ?? array_key_first($this->tabs);
+
+        // اعتبارسنجی تب درخواستی
+        if (empty($this->tabs) || !isset($this->tabs[$this->current_tab_id])) {
+            // اگر تب درخواستی وجود نداشت یا هیچ تبی ثبت نشده بود
+            if (!empty($this->tabs)) {
+                // تب درخواستی یافت نشد، به اولین تب برگرد.
+                $this->current_tab_id = array_key_first($this->tabs);
+                // می‌توانید به تب اول ریدایرکت کنید یا پیام خطا نمایش دهید.
+                // فعلاً فقط current_tab_id را تنظیم می‌کنیم.
+            } else {
+                // اصلاً تبی ثبت نشده است.
+                wp_die('هیچ تبی برای تنظیمات این پلاگین ثبت نشده است.');
+            }
+        }
+
+        $current_tab_data = $this->tabs[$this->current_tab_id]; // دریافت اطلاعات تب فعلی
+
+        ?>
+        <div class="nader-settings-wrap">
+            <h1><?php echo 'تنظیمات نادر'; // به جای get_admin_page_title() برای استفاده از متن ثابت فارسی
+                ?></h1>
+
+            <div class="nader-header">
+                <h2 class="nader-page-title wp-heading-inline"><?php echo esc_html($current_tab_data['title']) ?></h2>
+                <div class="header-actions">
+                </div>
+            </div>
+
+            <div class="nader-settings-body">
+                <nav class="nader-tabs-nav">
+                    <?php foreach ($this->tabs as $tab_id => $tab) :
+                        // ساخت URL تب، حذف پارامتر پیش‌فرض 'settings-updated' وردپرس
+                        $tab_url = add_query_arg('tab', $tab_id, remove_query_arg('settings-updated'));
+                        // حذف سایر پارامترهای مربوط به وضعیت یا خطاها اگر وجود دارند
+                        $tab_url = remove_query_arg(['message', 'type'], $tab_url);
+                        ?>
+                        <a href="<?php echo esc_url($tab_url) ?>"
+                           class="nader-tab <?php echo $tab_id === $this->current_tab_id ? 'active' : '' ?>">
+                            <?php if (!empty($tab['icon'])) : ?>
+                                <span class="dashicons <?php echo esc_attr($tab['icon']) ?>"></span>
+                            <?php endif; ?>
+                            <?php echo esc_html($tab['title']) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </nav>
+
+                <div class="nader-tab-content">
+                    <form id="nader-settings-form" method="post">
+                        <?php
+                        // فیلد Nonce برای امنیت فرم
+                        wp_nonce_field('nader_settings_nonce', 'nader_nonce');
+                        // فیلد مخفی برای ارسال شناسه تب فعلی با فرم (اختیاری)
+                        // <input type="hidden" name="current_tab_id" value="<?php echo esc_attr($this->current_tab_id); ">
+                        ?>
+                        <div class="nader-settings-fields">
+                            <?php
+                            // فراخوانی هوک اکشن برای نمایش محتوای تب فعلی.
+                            // فایل‌های تب باید به این اکشن هوک کنند تا فیلدهای خود را رندر کنند.
+                            do_action("nader_settings_tab_{$this->current_tab_id}", $this);
+                            ?>
+                        </div>
+                        <div class="nader-form-footer">
+                            <button type="submit" class="button button-primary save-settings">
+                                ذخیره تغییرات
+                            </button>
+                            <button type="button" class="button button-secondary reset-settings">
+                                بازنشانی
+                            </button>
+                            <span class="spinner"></span></div>
+                    </form>
+                </div>
+            </div>
+            <div class="nader-notice-area"></div>
+        </div>
+        <?php
+    }
+
+    /**
+     * مدیریت درخواست AJAX برای ذخیره تنظیمات.
+     * در این متد، روی پیکربندی‌های ماژول ثبت شده حلقه می‌زنیم و آن‌ها را پردازش می‌کنیم.
+     */
+    public function save_settings()
+    {
+        // بررسی Nonce برای امنیت درخواست AJAX
+        check_ajax_referer('nader_settings_nonce', 'nonce');
+
+        // بررسی قابلیت کاربر برای انجام این عمل
+        if (!current_user_can('manage_options')) {
+            // ارسال پاسخ خطای JSON با کد وضعیت HTTP 403 (Forbidden)
+            wp_send_json_error('دسترسی غیرمجاز.', 403);
+        }
+
+        // دریافت رشته سریالایز شده داده‌های فرم از درخواست POST
+        $raw_data = $_POST['settings'] ?? '';
+
+        // --- قدم حیاتی: تجزیه رشته سریالایز شده به یک آرایه PHP ---
+        parse_str($raw_data, $submitted_data);
+
+        // حذف فیلدهای کنترلی
+        unset($submitted_data["nader_nonce"]);
+        unset($submitted_data["_wp_http_referer"]);
+        unset($submitted_data["current_tab_id"]);
+
+
+        $processed_settings = []; // آرایه‌ای برای نگهداری داده‌های پردازش شده و معتبر
+        $validation_errors = [];  // آرایه‌ای برای نگهداری خطاهای اعتبارسنجی
+
+        // --- بررسی وجود پیکربندی ماژول‌های ثبت شده ---
+        if (empty($this->registered_module_configs)) {
+            error_log('Nader Settings AJAX Save Error: هیچ پیکربندی ماژولی ثبت نشده است.');
+            wp_send_json_error('خطای داخلی: پیکربندی ماژول‌ها در دسترس نیست.', 500);
+        }
+
+        // --- حلقه زدن روی پیکربندی‌های ماژول ثبت شده برای اعتبارسنجی و پردازش ---
+        // این ensures که ما از نام‌های صحیح فیلدها و پیکربندی‌های درست استفاده می‌کنیم.
+        foreach ($this->registered_module_configs as $module_name => $module_config) {
+            // پیدا کردن نام کلاس ماژول بر اساس 'type' در پیکربندی (مثال: 'text' -> 'Nader_Text')
+            $module_class_name = 'Nader_' . str_replace(' ', '', ucwords(str_replace('-', ' ', $module_config['type'] ?? '')));
+
+            // بررسی اینکه آیا کلاس ماژول برای این نوع وجود دارد و از Nader_Module ارث می‌برد
+            if (!class_exists($module_class_name) || !is_subclass_of($module_class_name, 'Nader_Module')) {
+                error_log('Nader Settings AJAX Save Error: کلاس ماژول برای نوع "' . ($module_config['type'] ?? 'نامشخص') . '" (' . $module_class_name . ') یافت نشد یا از Nader_Module ارث نمی‌برد.');
+                // می‌توانیم این خطا را نادیده بگیریم یا یک خطای جدی‌تر ارسال کنیم. فعلاً ادامه می‌دهیم.
+                continue; // به ماژول بعدی می‌رویم
+            }
+
+            // نمونه‌سازی ماژول با استفاده از آرگومان‌های ثبت شده
+            // این ensure می‌کند که ماژول با نام، الزامی بودن، چندزبانه بودن و سایر تنظیمات صحیح ساخته شده است.
+            $module_instance = new $module_class_name($module_config);
+
+            // فراخوانی متد handle_submission بر روی این نمونه ماژول صحیح
+            // $submitted_data شامل تمام داده‌های ارسالی است و ماژول خودش داده‌های مربوط به خود را پیدا می‌کند.
+            $module_result = $module_instance->handle_submission($submitted_data);
+
+            // تجمیع داده‌های پردازش شده از ماژول
+            if (!empty($module_result['processed_data'])) {
+                $processed_settings = array_merge($processed_settings, $module_result['processed_data']);
+            }
+
+            // تجمیع خطاهای اعتبارسنجی از ماژول
+            if (!empty($module_result['errors'])) {
+                $validation_errors = array_merge($validation_errors, $module_result['errors']);
+            }
+            // پس از پردازش هر ماژول، نمونه آن دیگر نیاز نیست و از حافظه پاک می‌شود.
+        }
+
+        // --- بررسی وجود خطاهای اعتبارسنجی تجمیع شده ---
+        if (!empty($validation_errors)) {
+            wp_send_json_error([
+                'message' => 'خطا در اعتبارسنجی فیلدها. لطفا موارد مشخص شده را بررسی کنید.',
+                'errors'  => $validation_errors
+            ], 400);
+        }
+
+        // --- اگر اعتبارسنجی تمام ماژول‌ها با موفقیت انجام شد، تنظیمات را در دیتابیس به‌روزرسانی کن ---
+        // تنظیمات موجود را بخوان تا تنظیمات سایر تب‌ها/ماژول‌ها که در فرم فعلی نیستند از بین نروند.
+        $all_settings = get_option(self::$settings_key, []);
+
+        // داده‌های پردازش شده جدید را با تنظیمات موجود ادغام کن.
+        $updated_settings = array_merge($all_settings, $processed_settings);
+
+        // ذخیره آرایه ترکیبی تنظیمات
+        update_option(self::$settings_key, $updated_settings);
+
+        // ارسال پاسخ موفقیت آمیز
+        wp_send_json_success('تنظیمات با موفقیت ذخیره شد!');
+    }
+
+    /**
+     * مدیریت درخواست AJAX برای بازنشانی تنظیمات.
+     */
+    public function reset_settings()
+    {
+        check_ajax_referer('nader_settings_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('دسترسی غیرمجاز.', 403);
+        }
+
+        // حذف گزینه تنظیمات از جدول wp_options
+        delete_option(self::$settings_key);
+
+        wp_send_json_success('تنظیمات با موفقیت بازنشانی شد!');
+    }
+
+
+    /**
+     * دریافت مقدار یک تنظیم خاص.
+     * از کش $settings_data بارگذاری شده در زمان init می‌خواند.
+     *
+     * @param string $name نام تنظیم (مثال: 'site_title__fa' یا 'site_tagline').
+     * @param mixed $default مقدار پیش‌فرض برای برگرداندن اگر تنظیم یافت نشد. به صورت پیش‌فرض null.
+     * @return mixed مقدار تنظیم یا مقدار پیش‌فرض.
+     */
+    public function get_setting(string $name, $default = null)
+    {
+        if (isset($this->settings_data[$name])) {
+            return $this->settings_data[$name];
+        }
+        return $default;
+    }
+
+    /**
+     * دریافت لیست زبان‌های فعال.
+     * این متد قابل فیلتر کردن است.
+     *
+     * @return array آرایه‌ای از کدهای زبان (مثال: ['fa', 'en']).
+     */
+    public function get_active_languages(): array
+    {
+        return apply_filters('nader_settings_active_languages', ['fa', 'en']);
+    }
+
+    /**
+     * متد کمکی برای دریافت پیکربندی یک ماژول ثبت شده بر اساس نام آن.
+     *
+     * @param string $name نام اصلی ماژول (مثال: 'site_title').
+     * @return array|null پیکربندی ماژول یا null.
+     */
+    public function get_registered_module_config(string $name): ?array
+    {
+        return $this->registered_module_configs[$name] ?? null;
+    }
+
+    // می‌توانید متدهای کمکی دیگر مورد نیاز را اینجا اضافه کنید.
+}
+
+// نمونه‌سازی کلاس اصلی پلاگین با فراخوانی متد singleton.
+Nader_Settings::instance();
