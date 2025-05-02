@@ -25,6 +25,7 @@ class Nader_Repeater extends Nader_Module {
         $items = is_array($value) ? $value : [];
         ?>
         <div class="nader-repeater-field"
+             data-name="<?php echo esc_attr($this->get_field_name()); ?>"
              data-min-items="<?php echo $this->args['min_items']; ?>"
              data-max-items="<?php echo $this->args['max_items']; ?>"
              data-fields='<?php echo json_encode($this->args['fields'], JSON_HEX_APOS | JSON_HEX_QUOT); ?>'>

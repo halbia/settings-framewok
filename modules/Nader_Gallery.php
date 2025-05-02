@@ -45,16 +45,11 @@ class Nader_Gallery extends Nader_Module {
         $image_urls = [];
         $preview_size = $this->args['preview_size']; // اندازه تصویر برای پیش‌نمایش
 
-        // لاگ برای عیب‌یابی: مشاهده مقدار ورودی و شناسه‌های استخراج شده
-         error_log('Nader Gallery Render: Field Name: ' . $name . ' | Saved Value: ' . print_r($value, true) . ' | Extracted IDs: ' . print_r($image_ids, true));
-
 
         // دریافت URL تصاویر برای نمایش پیش‌نمایش
         if (!empty($image_ids)) {
             foreach ($image_ids as $image_id) {
-                // لاگ برای عیب‌یابی: مشاهده نتیجه wp_get_attachment_image_src
                 $image_attributes = wp_get_attachment_image_src($image_id, $preview_size);
-                 error_log('Nader Gallery Render: Processing ID: ' . $image_id . ' | wp_get_attachment_image_src Result: ' . print_r($image_attributes, true));
 
                 if ($image_attributes) {
                     $image_urls[$image_id] = $image_attributes[0]; // ذخیره URL با کلید شناسه

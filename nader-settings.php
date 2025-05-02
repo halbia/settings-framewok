@@ -239,13 +239,10 @@ final class Nader_Settings{
         wp_enqueue_style('thickbox');
         wp_enqueue_script('wp-color-picker');
         wp_enqueue_script('nader-select2', NAD_SETTINGS_URL . 'assets/select2/select2.min.js', ['jquery'], '4.0.3', true);
-        wp_enqueue_script('sortablejs', NAD_SETTINGS_URL . 'assets/js/Sortable.min.js', [], '1.15.0', true);
         wp_enqueue_script('media-upload');
         wp_enqueue_script('thickbox');
         wp_enqueue_script('wp-editor');
 
-        // اسکریپت اصلی مدیریت پلاگین شما
-        // این اسکریپت باید پس از تمام وابستگی‌هایش (jQuery, Color Picker, Select2, SortableJS, Media Upload, WP Editor) بارگذاری شود.
         wp_enqueue_script(
             'nader-settings-admin', // Handle سفارشی
             NAD_SETTINGS_URL . 'assets/js/admin.js',
@@ -253,7 +250,6 @@ final class Nader_Settings{
                 'jquery',           // نیاز عمومی به jQuery
                 'wp-color-picker',  // برای ماژول Color
                 'nader-select2',    // برای ماژول Choose
-                'sortablejs',       // برای ماژول Repeater (جابجایی)
                 'media-upload',     // برای ماژول Image و Gallery (مدال وردپرس)
                 'thickbox',         // برای مدال Media Library
                 'wp-editor',        // برای ماژول WP Editor (API)
@@ -385,8 +381,10 @@ final class Nader_Settings{
         // دریافت رشته سریالایز شده داده‌های فرم از درخواست POST
         $raw_data = $_POST['settings'] ?? '';
 
+
         // --- قدم حیاتی: تجزیه رشته سریالایز شده به یک آرایه PHP ---
         parse_str($raw_data, $submitted_data);
+//        error_log(print_r($submitted_data,true)); // لاگ برای عیب‌یابی
 
         // حذف فیلدهای کنترلی
         unset($submitted_data["nader_nonce"]);

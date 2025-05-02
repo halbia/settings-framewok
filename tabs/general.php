@@ -246,31 +246,12 @@ $nader_settings->register_module_config([
 ]);
 
 $nader_settings->register_module_config([
-    'name' => 'team_members',
-    'title' => 'Team Members',
+    'name'   => 'team',
     'type' => 'repeater',
-    'min_items' => 1,
-    'max_items' => 5,
-    'collapsible' => true,
     'fields' => [
-        [
-            'name' => 'name',
-            'title' => 'Name',
-            'type' => 'text',
-            'required' => true
-        ],
-        [
-            'name' => 'photo',
-            'title' => 'Photo',
-            'type' => 'image',
-            'button_text' => 'Upload Photo'
-        ],
-        [
-            'name' => 'color',
-            'title' => 'Accent Color',
-            'type' => 'color',
-            'default' => '#336699'
-        ]
+        ['name' => 'name', 'type' => 'text', 'title' => 'نام'],
+        ['name' => 'photo', 'type' => 'image', 'title' => 'عکس'],
+        ['name' => 'color', 'type' => 'color', 'title' => 'رنگ']
     ]
 ]);
 
@@ -497,24 +478,11 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
 
     // رندر فیلد
     $repeater = new Nader_Repeater([
-        'name' => 'team_members',
-        'title' => 'Team Members',
+        'name' => 'team',
         'fields' => [
-            [
-                'name' => 'name',
-                'type' => 'text',
-                'title' => 'Name'
-            ],
-            [
-                'name' => 'photo',
-                'type' => 'image',
-                'title' => 'Profile Photo'
-            ],
-            [
-                'name' => 'color',
-                'type' => 'color',
-                'title' => 'Accent Color'
-            ]
+            ['name' => 'name', 'type' => 'text', 'title' => 'نام'],
+            ['name' => 'photo', 'type' => 'image', 'title' => 'عکس'],
+            ['name' => 'color', 'type' => 'color', 'title' => 'رنگ']
         ]
     ]);
     $repeater->render();

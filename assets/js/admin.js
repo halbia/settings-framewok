@@ -479,37 +479,34 @@ jQuery(document).ready(function($) {
     function initializeRepeaterFields($container) {
         $container.find('.nader-repeater-field').each(function() {
             const $repeater = $(this);
+            const baseName = $repeater.data('name');
+            const fieldsConfig = $repeater.data('fields');
             const $itemsContainer = $repeater.find('.repeater-items');
             const $addButton = $repeater.find('.add-repeater-item');
-            const fieldsConfig = $repeater.data('fields'); // داده خودکار توسط jQuery پارس شده
-
-            // تنظیمات اولیه
-            let itemCount = $itemsContainer.children().length;
             const minItems = parseInt($repeater.data('min-items')) || 0;
             const maxItems = parseInt($repeater.data('max-items')) || 0;
 
-            // مدیریت افزودن آیتم
+            // افزودن آیتم جدید
             $addButton.off('click').on('click', function() {
-                if (maxItems > 0 && itemCount >= maxItems) return;
+                if(maxItems > 0 && $itemsContainer.children().length >= maxItems) return;
 
-                const $newItem = createRepeaterItem(itemCount, fieldsConfig);
+                const newIndex = $itemsContainer.children().length;
+                const $newItem = createRepeaterItem(baseName, newIndex, fieldsConfig);
                 $itemsContainer.append($newItem);
-                initializeNaderSettingsModules($newItem); // فعال سازی ماژول‌ها
-                itemCount++;
-                updateButtonStates();
+                initializeNaderSettingsModules($newItem);
+                updateUI();
             });
 
             // مدیریت حذف آیتم
             $itemsContainer.off('click', '.remove-item').on('click', '.remove-item', function() {
-                if (itemCount <= minItems) return;
+                if($itemsContainer.children().length <= minItems) return;
 
                 $(this).closest('.repeater-item').remove();
-                itemCount--;
                 reindexItems();
-                updateButtonStates();
+                updateUI();
             });
 
-            // مدیریت جابجایی
+            // جابجایی آیتم‌ها
             $itemsContainer.off('click', '.move-up').on('click', '.move-up', function() {
                 const $item = $(this).closest('.repeater-item');
                 $item.insertBefore($item.prev());
@@ -522,16 +519,10 @@ jQuery(document).ready(function($) {
                 reindexItems();
             });
 
-            // مدیریت نمایش/پنهان سازی
-            $itemsContainer.off('click', '.toggle-item').on('click', '.toggle-item', function() {
-                $(this).closest('.repeater-item').find('.item-content').slideToggle();
-                $(this).text($(this).text() === '▼' ? '▲' : '▼');
-            });
-
-            // تابع ایجاد آیتم جدید
-            function createRepeaterItem(index, fields) {
-                const $item = $(
-                    `<div class="repeater-item" data-index="${index}">
+            // ایجاد آیتم جدید
+            function createRepeaterItem(baseName, index, fields) {
+                const $item = $(`
+                <div class="repeater-item" data-index="${index}">
                     <div class="item-header">
                         <span class="item-title">آیتم ${index + 1}</span>
                         <div class="item-actions">
@@ -542,54 +533,74 @@ jQuery(document).ready(function($) {
                         </div>
                     </div>
                     <div class="item-content"></div>
-                </div>`
-                );
+                </div>
+            `);
 
-                const $content = $item.find('.item-content');
                 fields.forEach(field => {
-                    const $field = createField(field, index);
-                    $content.append($field);
+                    const $field = createField(baseName, index, field);
+                    $item.find('.item-content').append($field);
                 });
 
                 return $item;
             }
 
-            // تابع ایجاد فیلدها
-            function createField(fieldConfig, index) {
-                const fieldName = `${$repeater.data('name')}[${index}][${fieldConfig.name}]`;
+            // ایجاد فیلدها
+            function createField(baseName, index, fieldConfig) {
+                const fieldName = `${baseName}[${index}][${fieldConfig.name}]`;
+                let $field;
 
-                // قالب پایه برای تمام فیلدها
-                const $wrapper = $(
-                    `<div class="nader-repeater-field" data-field-type="${fieldConfig.type}">
-                    <label class="nader-field-label">${fieldConfig.title}</label>
-                    <div class="nader-field-content"></div>
-                    <ul class="nader-errors"></ul>
-                </div>`
-                );
-
-                const $content = $wrapper.find('.nader-field-content');
-
-                // ایجاد فیلد بر اساس نوع
                 switch(fieldConfig.type) {
                     case 'text':
-                        $content.append(
-                            `<input type="text" 
-                               name="${fieldName}" 
-                               class="nader-text-input"
-                               placeholder="${fieldConfig.placeholder || ''}">`
-                        );
+                        $field = $(`<input type="text" name="${fieldName}" class="nader-text-input">`);
+                        break;
+
+                    case 'textarea':
+                        $field = $(`<textarea name="${fieldName}" rows="3" class="nader-textarea-input"></textarea>`);
+                        break;
+
+                    case 'checkbox':
+                        $field = $(`
+                        <label class="nader-checkbox-wrapper">
+                            <input type="checkbox" name="${fieldName}" value="1" class="nader-checkbox-input">
+                            <span class="checkmark"></span>
+                            ${fieldConfig.label || ''}
+                        </label>
+                    `);
+                        break;
+
+                    case 'radio':
+                        $field = $(`<div class="nader-radio-group"></div>`);
+                        fieldConfig.options.forEach(option => {
+                            $field.append(`
+                            <label class="nader-radio-option">
+                                <input type="radio" name="${fieldName}" value="${option.value}">
+                                ${option.label}
+                            </label>
+                        `);
+                        });
+                        break;
+
+                    case 'select':
+                        $field = $(`<select name="${fieldName}" class="nader-select-input"></select>`);
+                        fieldConfig.options.forEach(option => {
+                            $field.append(`<option value="${option.value}">${option.label}</option>`);
+                        });
+                        break;
+
+                    case 'color':
+                        $field = $(`
+                        <input type="text" 
+                            class="nader-color-picker"
+                            name="${fieldName}"
+                            data-default-color="${fieldConfig.default || '#ffffff'}">
+                    `);
                         break;
 
                     case 'image':
-                        $content.append(`
+                        $field = $(`
                         <div class="nader-image-upload-field">
-                            <input type="hidden" 
-                                   class="nader-image-id-input" 
-                                   name="${fieldName}">
-                            <button type="button" 
-                                    class="button nader-select-image-button"
-                                    data-uploader-title="${fieldConfig.uploader_title || 'انتخاب تصویر'}"
-                                    data-uploader-button-text="${fieldConfig.button_text || 'استفاده از تصویر'}">
+                            <input type="hidden" class="nader-image-id-input" name="${fieldName}">
+                            <button type="button" class="button nader-select-image-button">
                                 ${fieldConfig.button_text || 'انتخاب تصویر'}
                             </button>
                             <div class="nader-image-preview"></div>
@@ -597,22 +608,64 @@ jQuery(document).ready(function($) {
                     `);
                         break;
 
-                    case 'color':
-                        $content.append(`
-                        <input type="text" 
-                               class="nader-color-picker"
-                               name="${fieldName}"
-                               data-default-color="${fieldConfig.default || '#ffffff'}">
+                    case 'gallery':
+                        $field = $(`
+                        <div class="nader-gallery-field">
+                            <input type="hidden" class="nader-gallery-ids-input" name="${fieldName}">
+                            <button type="button" class="button nader-select-gallery-button">
+                                ${fieldConfig.button_text || 'انتخاب گالری'}
+                            </button>
+                            <div class="nader-gallery-preview"></div>
+                        </div>
                     `);
                         break;
 
-                    // اضافه کردن انواع دیگر فیلدها در اینجا
+                    case 'range_slider':
+                        $field = $(`
+                        <div class="nader-range-slider-field">
+                            <input type="range" 
+                                class="nader-range-input"
+                                name="${fieldName}"
+                                min="${fieldConfig.min || 0}"
+                                max="${fieldConfig.max || 100}"
+                                step="${fieldConfig.step || 1}"
+                                value="${fieldConfig.default || 50}">
+                            <input type="number" 
+                                class="nader-number-input"
+                                value="${fieldConfig.default || 50}">
+                            <span class="unit">${fieldConfig.unit || ''}</span>
+                        </div>
+                    `);
+                        break;
+
+                    case 'toggle':
+                        $field = $(`
+                        <label class="nader-toggle-switch">
+                            <input type="checkbox" name="${fieldName}" class="nader-toggle-input">
+                            <span class="slider round"></span>
+                        </label>
+                    `);
+                        break;
+
+                    case 'wp_editor':
+                        $field = $(`
+                        <div class="nader-wp-editor-wrapper">
+                            <textarea name="${fieldName}" class="nader-wp-editor-input"></textarea>
+                        </div>
+                    `);
+                        break;
 
                     default:
-                        console.warn('نوع فیلد ناشناخته:', fieldConfig.type);
+                        $field = $(`<p>نوع فیلد نامعتبر: ${fieldConfig.type}</p>`);
                 }
 
-                return $wrapper;
+                return $(`
+                <div class="nader-field-wrapper" data-type="${fieldConfig.type}">
+                    <label class="nader-field-label">${fieldConfig.title}</label>
+                    <div class="nader-field-content">${$field.prop('outerHTML')}</div>
+                    <ul class="nader-errors"></ul>
+                </div>
+            `);
             }
 
             // به‌روزرسانی شماره آیتم‌ها
@@ -624,70 +677,38 @@ jQuery(document).ready(function($) {
                 });
             }
 
-            // به‌روزرسانی وضعیت دکمه‌ها
-            function updateButtonStates() {
-                $addButton.toggle(maxItems === 0 || itemCount < maxItems);
-                $itemsContainer.find('.remove-item').prop(
-                    'disabled',
-                    itemCount <= minItems
-                );
+            // به‌روزرسانی وضعیت UI
+            function updateUI() {
+                const itemCount = $itemsContainer.children().length;
+                $addButton.toggle(!maxItems || itemCount < maxItems);
+                $itemsContainer.find('.remove-item').prop('disabled', itemCount <= minItems);
             }
 
             // مقداردهی اولیه
-            updateButtonStates();
+            updateUI();
         });
     }
 
+    function initializeNaderSettingsModules($container) {
 
-    // --- اولیه سازی تمام ماژول‌های سمت کلاینت هنگام بارگذاری صفحه یا در یک کانتینر خاص ---
-    // این تابع حالا یک پارامتر اختیاری $container می‌گیرد تا بتواند فقط ماژول‌های داخل یک کانتینر خاص را اولیه سازی کند (مثلاً آیتم جدید Repeater).
-    function initializeNaderSettingsModules($container = null) {
-        // اگر کانتینر null بود، در کل صفحه جستجو کن. از $container به عنوان یک شیء jQuery استفاده می‌کنیم.
-        const $searchContext = ($container instanceof $) ? $container : $('.nader-settings-wrap');
-
-        // گزارش برای عیب یابی
-        // console.log('Initializing modules within:', $searchContext);
-
-
-        // اولیه سازی Color Pickers
-        // بررسی وجود تابع wpColorPicker قبل از فراخوانی تابع initializeColorPickers
-        if (typeof $.fn.wpColorPicker === 'undefined') {
-            console.warn('Nader Settings JS: تابع wpColorPicker در دسترس نیست. ماژول Color کار نخواهد کرد.');
-        } else {
-            initializeColorPickers($searchContext);
+        if (!$container || $container.length === 0) {
+            // اگر کانتینر null بود، در کل صفحه جستجو کن. از $container به عنوان یک شیء jQuery استفاده می‌کنیم.
+            $container = ($container instanceof $) ? $container : $('.nader-settings-wrap');
         }
 
+        initializeColorPickers($container)
 
-        // اولیه سازی Range Sliders
-        initializeRangeSliders($searchContext);
+        initializeChooseFields($container)
 
+        initializeRepeaterFields($container)
 
-        // فعال کردن Select2 برای ماژول Choose
-        // اطمینان از وجود تابع select2 قبل از فراخوانی تابع initializeChooseFields
-        if (typeof $.fn.select2 === 'undefined') {
-            console.warn('Nader Settings JS: تابع select2 در دسترس نیست. ماژول Choose کار نخواهد کرد.');
-        } else {
-            initializeChooseFields($searchContext);
-        }
+        initializeWpEditors($container)
 
+        initializeImageSelectFields($container)
 
-        // فعال کردن منطق Image Select
-        initializeImageSelectFields($searchContext);
+        initializeRangeSliders($container)
 
-
-        // فعال کردن WP Editor در کانتینر مشخص شده
-        // این نیاز به initialize مجدد برای آیتم‌های جدید Repeater دارد.
-        // باید wp.editor.init() را برای textarea های جدید اجرا کنیم.
-        if (typeof wp === 'undefined' || typeof wp.editor === 'undefined' || typeof wp.editor.init !== 'function') {
-            console.warn('Nader Settings JS: WP Editor API (wp.editor.init) در دسترس نیست. ماژول WP Editor در آیتم‌های جدید Repeater به درستی اولیه سازی نخواهد شد.');
-        } else {
-            initializeWpEditors($searchContext); // اولیه سازی WP Editors در کانتینر فعلی
-        }
-
-        if ($container === null) {
-            initializeRepeaterFields($searchContext);
-        }
-    } // پایان initializeNaderSettingsModules
+    }
 
 
     // --- فراخوانی اولیه سازی هنگام بارگذاری صفحه ---
