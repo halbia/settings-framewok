@@ -1,4 +1,3 @@
-@charset "UTF-8";
 .nader-settings-wrap {
   display: flex;
   flex-direction: column;
@@ -74,8 +73,8 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-.nader-field-wrapper {
-  margin-bottom: 24px;
+.nader-field-wrapper + .nader-field-wrapper {
+  margin-top: 24px;
 }
 .nader-field-wrapper.has-error {
   box-shadow: 0 1px 3px rgba(176, 0, 32, 0.2), 0 1px 2px rgba(176, 0, 32, 0.4);
@@ -503,13 +502,67 @@ hr {
   color: #666 !important;
 }
 
-.nader-field-repeater {
-  /* استایل پایه برای محتوای مخفی */
-  /* آیکون toggle وقتی محتوا نمایش داده می‌شود */
+.nader-field-repeater .repeater-item {
+  padding: 10px;
+  background: #f8f8f8;
+}
+.nader-field-repeater .repeater-item .item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nader-field-repeater .repeater-item .item-header .item-title {
+  font-size: 13px;
+  font-weight: bold;
+}
+.nader-field-repeater .repeater-item .item-header .item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.nader-field-repeater .repeater-item .item-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+.nader-field-repeater .repeater-item .item-header button svg {
+  width: 16px;
+}
+.nader-field-repeater .repeater-item .item-header button:hover {
+  background: #03dac6;
+}
+.nader-field-repeater .repeater-item .item-header button:hover svg {
+  fill: white;
+}
+.nader-field-repeater .repeater-item .item-header .remove-item {
+  background: #b00020;
+}
+.nader-field-repeater .repeater-item .item-header .remove-item svg {
+  fill: white;
+}
+.nader-field-repeater .repeater-item .item-header .remove-item:hover {
+  background: white;
+}
+.nader-field-repeater .repeater-item .item-header .remove-item:hover svg {
+  fill: #b00020;
+}
+.nader-field-repeater .repeater-item + .repeater-item {
+  margin-top: 12px;
 }
 .nader-field-repeater .item-content {
+  margin-top: 10px;
   padding: 10px;
-  background: #f5f5f5;
+  border-top: 1px solid #eee;
+}
+.nader-field-repeater .item-content .nader-field-label {
+  font-size: 12px;
 }
 .nader-field-repeater .item-content.active + .item-header .toggle-item {
   transform: rotate(180deg);
@@ -519,6 +572,15 @@ hr {
   border: none;
   background: none;
   cursor: pointer;
+}
+.nader-field-repeater .add-repeater-item {
+  background: #6200ee;
+  color: white;
+  padding: 10px 30px;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  border-radius: 4px;
 }
 
 /*# sourceMappingURL=admin.css.map */

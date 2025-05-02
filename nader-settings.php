@@ -446,7 +446,7 @@ final class Nader_Settings{
         update_option(self::$settings_key, $updated_settings);
 
         // Log final data
-        error_log('Nader Settings Final Saved Data: ' . print_r($updated_settings, true));
+//        error_log('Nader Settings Final Saved Data: ' . print_r($updated_settings, true));
 
         wp_send_json_success('تنظیمات با موفقیت ذخیره شدند');
     }
