@@ -245,6 +245,35 @@ $nader_settings->register_module_config([
     'default'     => 'layout_right_simple', // مقدار پیش‌فرض (value)
 ]);
 
+$nader_settings->register_module_config([
+    'name' => 'team_members',
+    'title' => 'Team Members',
+    'type' => 'repeater',
+    'min_items' => 1,
+    'max_items' => 5,
+    'collapsible' => true,
+    'fields' => [
+        [
+            'name' => 'name',
+            'title' => 'Name',
+            'type' => 'text',
+            'required' => true
+        ],
+        [
+            'name' => 'photo',
+            'title' => 'Photo',
+            'type' => 'image',
+            'button_text' => 'Upload Photo'
+        ],
+        [
+            'name' => 'color',
+            'title' => 'Accent Color',
+            'type' => 'color',
+            'default' => '#336699'
+        ]
+    ]
+]);
+
 
 // 2. تعریف محتوای تب عمومی برای رندر کردن
 // این بخش با استفاده از اکشن پویا 'nader_settings_tab_{tab_id}' انجام می‌شود.
@@ -465,5 +494,29 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
     ]);
     $image_select_url_simple_field->render();
     echo '<hr>'; // جداکننده
+
+    // رندر فیلد
+    $repeater = new Nader_Repeater([
+        'name' => 'team_members',
+        'title' => 'Team Members',
+        'fields' => [
+            [
+                'name' => 'name',
+                'type' => 'text',
+                'title' => 'Name'
+            ],
+            [
+                'name' => 'photo',
+                'type' => 'image',
+                'title' => 'Profile Photo'
+            ],
+            [
+                'name' => 'color',
+                'type' => 'color',
+                'title' => 'Accent Color'
+            ]
+        ]
+    ]);
+    $repeater->render();
 
 }, 10, 1); // پایان add_action برای تب عمومی

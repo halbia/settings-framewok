@@ -119,17 +119,6 @@ final class Nader_Settings{
         // آرایه this->modules دیگر در اینجا پر نمی‌شود.
     }
 
-    /**
-     * دریافت نام کلاس ماژول بر اساس نام فایل.
-     *
-     * @param string $module_file_path مسیر کامل فایل ماژول.
-     * @return string|null نام کلاس ماژول یا null.
-     */
-    public function get_module_class_name_from_file(string $module_file_path): ?string
-    {
-        return $this->loaded_module_classes[$module_file_path] ?? null;
-    }
-
 
     /**
      * بارگذاری فایل‌های تعریف تب از پوشه 'tabs/'.
@@ -191,18 +180,6 @@ final class Nader_Settings{
         // ذخیره آرگومان‌های ماژول با نام به عنوان کلید
         $this->registered_module_configs[$module_args['name']] = $module_args;
     }
-
-    /**
-     * جدید: دریافت پیکربندی یک ماژول بر اساس نام آن.
-     *
-     * @param string $name نام اصلی ماژول.
-     * @return array|null پیکربندی ماژول یا null.
-     */
-    public function get_module_config(string $name): ?array
-    {
-        return $this->registered_module_configs[$name] ?? null;
-    }
-
 
     /**
      * ثبت هوک‌های اکشن و فیلتر وردپرس.

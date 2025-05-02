@@ -476,224 +476,165 @@ jQuery(document).ready(function($) {
         });
     }
 
+    function initializeRepeaterFields($container) {
+        $container.find('.nader-repeater-field').each(function() {
+            const $repeater = $(this);
+            const $itemsContainer = $repeater.find('.repeater-items');
+            const $addButton = $repeater.find('.add-repeater-item');
+            const fieldsConfig = $repeater.data('fields'); // داده خودکار توسط jQuery پارس شده
 
-    // --- جدید: منطق فعال کردن ماژول Repeater ---
+            // تنظیمات اولیه
+            let itemCount = $itemsContainer.children().length;
+            const minItems = parseInt($repeater.data('min-items')) || 0;
+            const maxItems = parseInt($repeater.data('max-items')) || 0;
 
-    // تابع برای به‌روزرسانی ایندکس‌ها در نام فیلدها پس از تغییر (افزودن، حذف، جابجایی)
-    function updateRepeaterItemIndices($repeaterList) {
-        $repeaterList.find('> li.nader-repeater-item').each(function(itemIndex) {
-            const $item = $(this);
-            // به‌روزرسانی ویژگی داده ایندکس آیتم
-            $item.data('item-index', itemIndex);
+            // مدیریت افزودن آیتم
+            $addButton.off('click').on('click', function() {
+                if (maxItems > 0 && itemCount >= maxItems) return;
 
-            // پیدا کردن تمام فیلدهای ورودی (input, select, textarea), کانتینرهای خطا و label ها در این آیتم
-            $item.find(':input, .nader-errors, label').each(function() {
-                const $el = $(this);
-                const currentId = $el.attr('id');
-                const currentName = $el.attr('name'); // فقط برای input/select/textarea
-                const currentFor = $el.attr('for'); // فقط برای label
-                const elementTag = $el.prop('tagName').toLowerCase();
-
-                // به‌روزرسانی ID: جایگزینی __INDEX__ با ایندکس جدید
-                if (currentId && currentId.indexOf('__INDEX__') !== -1) {
-                    $el.attr('id', currentId.replace(/__INDEX__/g, itemIndex)); // استفاده از g برای جایگزینی همه موارد
-                } else if (currentId) {
-                    // اگر از قبل ایندکس عددی داشت، آن را با ایندکس جدید جایگزین کن.
-                    const newId = currentId.replace(/\[\d+\]/, '[' + itemIndex + ']');
-                    if (newId !== currentId) { // فقط اگر جایگزینی انجام شد
-                        $el.attr('id', newId);
-                    }
-                }
-
-
-                // به‌روزرسانی Name (برای input, select, textarea)
-                if (currentName && currentName.indexOf('__INDEX__') !== -1) {
-                    $el.attr('name', currentName.replace(/__INDEX__/g, itemIndex)); // استفاده از g برای جایگزینی همه موارد
-                } else if (currentName) {
-                    // اگر از قبل ایندکس عددی داشت، آن را با ایندکس جدید جایگزین کن.
-                    const newName = currentName.replace(/\[\d+\]/, '[' + itemIndex + ']');
-                    if (newName !== currentName) { // فقط اگر جایگزینی انجام شد
-                        $el.attr('name', newName);
-                    }
-                }
-
-                // به‌روزرسانی For (برای label)
-                if (currentFor && currentFor.indexOf('__INDEX__') !== -1 && elementTag === 'label') {
-                    $el.attr('for', currentFor.replace(/__INDEX__/g, itemIndex)); // استفاده از g
-                } else if (currentFor && elementTag === 'label') {
-                    // اگر از قبل ایندکس عددی در for داشت، آن را با ایندکس جدید جایگزین کن.
-                    const newFor = currentFor.replace(/\[\d+\]/, '[' + itemIndex + ']');
-                    if (newFor !== currentFor) { // فقط اگر جایگزینی انجام شد
-                        $el.attr('for', newFor);
-                    }
-                }
-
+                const $newItem = createRepeaterItem(itemCount, fieldsConfig);
+                $itemsContainer.append($newItem);
+                initializeNaderSettingsModules($newItem); // فعال سازی ماژول‌ها
+                itemCount++;
+                updateButtonStates();
             });
 
-            // به‌روزرسانی عنوان آیتم (اختیاری)
-            $item.find('.item-title').text('آیتم #' + (itemIndex + 1));
+            // مدیریت حذف آیتم
+            $itemsContainer.off('click', '.remove-item').on('click', '.remove-item', function() {
+                if (itemCount <= minItems) return;
 
-            // اگر ماژول خاصی نیاز به Initializing مجدد پس از کلون/جابجایی دارد، اینجا صدا زده شود.
-            // این تابع InitializeNaderSettingsModules را با این آیتم فراخوانی می‌کند
-            // (initializeNaderSettingsModules خودش توابع اولیه سازی ماژول‌های خاص را صدا می‌زند).
-            // این فراخوانی در initializeRepeaters در زمان افزودن آیتم جدید انجام می‌شود.
+                $(this).closest('.repeater-item').remove();
+                itemCount--;
+                reindexItems();
+                updateButtonStates();
+            });
 
-        });
+            // مدیریت جابجایی
+            $itemsContainer.off('click', '.move-up').on('click', '.move-up', function() {
+                const $item = $(this).closest('.repeater-item');
+                $item.insertBefore($item.prev());
+                reindexItems();
+            });
 
-        // نمایش/پنهان کردن دکمه افزودن آیتم بر اساس max_items
-        const $repeaterField = $repeaterList.closest('.nader-repeater-field');
-        const maxItems = parseInt($repeaterField.data('max-items'), 10);
-        const currentItemCount = $repeaterList.find('> li.nader-repeater-item').length;
-        const $addButton = $repeaterField.find('.nader-repeater-add-item');
+            $itemsContainer.off('click', '.move-down').on('click', '.move-down', function() {
+                const $item = $(this).closest('.repeater-item');
+                $item.insertAfter($item.next());
+                reindexItems();
+            });
 
-        if (maxItems > 0 && currentItemCount >= maxItems) {
-            $addButton.hide();
-        } else {
-            $addButton.show();
-        }
+            // مدیریت نمایش/پنهان سازی
+            $itemsContainer.off('click', '.toggle-item').on('click', '.toggle-item', function() {
+                $(this).closest('.repeater-item').find('.item-content').slideToggle();
+                $(this).text($(this).text() === '▼' ? '▲' : '▼');
+            });
 
-        // نمایش/پنهان کردن دکمه حذف آیتم بر اساس min_items
-        const minItems = parseInt($repeaterField.data('min-items'), 10);
-        $repeaterList.find('> li.nader-repeater-item .item-remove').each(function() {
-            // دکمه حذف را فقط زمانی نمایش بده که تعداد آیتم‌ها بیشتر از حداقل است.
-            if (minItems > 0 && currentItemCount <= minItems) {
-                $(this).hide();
-            } else {
-                $(this).show();
+            // تابع ایجاد آیتم جدید
+            function createRepeaterItem(index, fields) {
+                const $item = $(
+                    `<div class="repeater-item" data-index="${index}">
+                    <div class="item-header">
+                        <span class="item-title">آیتم ${index + 1}</span>
+                        <div class="item-actions">
+                            <button type="button" class="move-up">↑</button>
+                            <button type="button" class="move-down">↓</button>
+                            <button type="button" class="toggle-item">▼</button>
+                            <button type="button" class="remove-item">×</button>
+                        </div>
+                    </div>
+                    <div class="item-content"></div>
+                </div>`
+                );
+
+                const $content = $item.find('.item-content');
+                fields.forEach(field => {
+                    const $field = createField(field, index);
+                    $content.append($field);
+                });
+
+                return $item;
             }
-        });
-    }
 
+            // تابع ایجاد فیلدها
+            function createField(fieldConfig, index) {
+                const fieldName = `${$repeater.data('name')}[${index}][${fieldConfig.name}]`;
 
-    // تابع اولیه سازی Repeater
-    function initializeRepeaters() {
-        $('.nader-repeater-field').each(function() {
-            const $repeaterField = $(this);
-            const $repeaterList = $repeaterField.find('.nader-repeater-items-list');
-            const $addButton = $repeaterField.find('.nader-repeater-add-item');
-            // تمپلیت آیتم، کلاس template روی li است.
-            const $templateItem = $repeaterField.find('.nader-repeater-item-template > li.nader-repeater-item.template');
+                // قالب پایه برای تمام فیلدها
+                const $wrapper = $(
+                    `<div class="nader-repeater-field" data-field-type="${fieldConfig.type}">
+                    <label class="nader-field-label">${fieldConfig.title}</label>
+                    <div class="nader-field-content"></div>
+                    <ul class="nader-errors"></ul>
+                </div>`
+                );
 
-            // --- مدیریت دکمه افزودن آیتم ---
-            $addButton.on('click', function() {
-                const newItemIndex = $repeaterList.find('> li.nader-repeater-item').length; // ایندکس آیتم جدید
-                const $newItem = $templateItem.clone(); // کلون کردن تمپلیت آیتم
+                const $content = $wrapper.find('.nader-field-content');
 
-                // حذف کلاس template از آیتم جدید کلون شده
-                $newItem.removeClass('template');
+                // ایجاد فیلد بر اساس نوع
+                switch(fieldConfig.type) {
+                    case 'text':
+                        $content.append(
+                            `<input type="text" 
+                               name="${fieldName}" 
+                               class="nader-text-input"
+                               placeholder="${fieldConfig.placeholder || ''}">`
+                        );
+                        break;
 
-                // به‌روزرسانی ایندکس‌ها و اولیه سازی زیرفیلدها در آیتم جدید
-                // در این بخش، فقط آیتم جدید را به‌روزرسانی و اولیه سازی می‌کنیم.
-                // updateRepeaterItemIndices در پایان افزودن/حذف/جابجایی کلی صدا زده می‌شود.
+                    case 'image':
+                        $content.append(`
+                        <div class="nader-image-upload-field">
+                            <input type="hidden" 
+                                   class="nader-image-id-input" 
+                                   name="${fieldName}">
+                            <button type="button" 
+                                    class="button nader-select-image-button"
+                                    data-uploader-title="${fieldConfig.uploader_title || 'انتخاب تصویر'}"
+                                    data-uploader-button-text="${fieldConfig.button_text || 'استفاده از تصویر'}">
+                                ${fieldConfig.button_text || 'انتخاب تصویر'}
+                            </button>
+                            <div class="nader-image-preview"></div>
+                        </div>
+                    `);
+                        break;
 
-                // به‌روزرسانی ID و Name و For در آیتم جدید کلون شده
-                $newItem.find(':input, .nader-errors, label').each(function() {
-                    const $el = $(this);
-                    const currentId = $el.attr('id');
-                    const currentName = $el.attr('name');
-                    const currentFor = $el.attr('for');
-                    const elementTag = $el.prop('tagName').toLowerCase();
+                    case 'color':
+                        $content.append(`
+                        <input type="text" 
+                               class="nader-color-picker"
+                               name="${fieldName}"
+                               data-default-color="${fieldConfig.default || '#ffffff'}">
+                    `);
+                        break;
 
-                    if (currentId && currentId.indexOf('__INDEX__') !== -1) {
-                        $el.attr('id', currentId.replace(/__INDEX__/g, newItemIndex));
-                    }
-                    if (currentName && currentName.indexOf('__INDEX__') !== -1) {
-                        $el.attr('name', currentName.replace(/__INDEX__/g, newItemIndex));
-                    }
-                    if (currentFor && currentFor.indexOf('__INDEX__') !== -1 && elementTag === 'label') {
-                        $el.attr('for', currentFor.replace(/__INDEX__/g, newItemIndex));
-                    }
-                    // پاک کردن مقادیر پیش‌فرض در فیلدهای آیتم جدید
-                    if ($el.is('input[type="text"], input[type="number"], input[type="email"], textarea')) {
-                        $el.val('');
-                    } else if ($el.is('input[type="checkbox"], input[type="radio"]')) {
-                        $el.prop('checked', false);
-                    } else if ($el.is('select')) {
-                        // Select2 نیاز به اولیه سازی دارد، مقدار خالی پیش فرض آن است.
-                        // $el.val(''); // مقدار Select2 را خالی کن.
-                    } else if ($el.is('.nader-image-id-input, .nader-gallery-ids-input')) {
-                        $el.val('');
-                        $el.closest('.nader-image-upload-field, .nader-gallery-field').find('.nader-image-preview, .nader-gallery-preview').empty();
-                        $el.closest('.nader-image-upload-field').find('.nader-remove-image-button').hide();
-                        $el.closest('.nader-gallery-field').find('.nader-clear-gallery-button').hide();
-                    } else if ($el.is('.nader-color-picker')) {
-                        $el.val('');
-                        // Color Picker نیاز به اولیه سازی دارد.
-                    } else if ($el.is('.nader-image-select-input')) {
-                        $el.val('');
-                        $el.closest('.nader-image-select-field').find('.image-option.selected').removeClass('selected');
-                    }
-                    // WP Editor نیاز به initializition مجدد دارد.
-                });
+                    // اضافه کردن انواع دیگر فیلدها در اینجا
 
-                // به‌روزرسانی ویژگی داده ایندکس آیتم جدید
-                $newItem.data('item-index', newItemIndex);
-                // به‌روزرسانی عنوان آیتم جدید
-                $newItem.find('.item-title').text('آیتم #' + (newItemIndex + 1));
-
-
-                // اضافه کردن آیتم جدید به لیست
-                $repeaterList.append($newItem);
-
-                // اولیه سازی ماژول‌های سمت کلاینت در آیتم جدید
-                initializeNaderSettingsModules($newItem); // فراخوانی تابع کلی اولیه سازی برای آیتم جدید
-
-                // به‌روزرسانی ایندکس‌ها در تمام آیتم‌ها پس از افزودن (این شامل آیتم جدید هم می‌شود)
-                updateRepeaterItemIndices($repeaterList);
-
-            });
-
-
-            // --- مدیریت دکمه حذف آیتم ---
-            // استفاده از Event Delegation روی لیست اصلی Repeater
-            $repeaterList.on('click', '.item-remove', function() {
-                const $itemToRemove = $(this).closest('.nader-repeater-item');
-                const currentItemCount = $repeaterList.find('> li.nader-repeater-item').length;
-                const minItems = parseInt($repeaterField.data('min-items'), 10);
-
-                if (minItems > 0 && currentItemCount <= minItems) {
-                    alert('نمی‌توانید کمتر از ' + minItems + ' آیتم داشته باشید.');
-                    return;
+                    default:
+                        console.warn('نوع فیلد ناشناخته:', fieldConfig.type);
                 }
 
-                // قبل از حذف، اگر WP Editor در این آیتم وجود دارد، آن را destroy کن.
-                $itemToRemove.find('textarea.nader-wp-editor-input').each(function() {
-                    const editorId = $(this).attr('id');
-                    if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
-                        tinymce.get(editorId).remove(); // حذف نمونه TinyMCE
-                    }
-                    // برای Quicktags نیاز به destroy خاصی نیست.
-                });
+                return $wrapper;
+            }
 
-
-                $itemToRemove.remove();
-
-                // به‌روزرسانی ایندکس‌ها در تمام آیتم‌های باقی‌مانده
-                updateRepeaterItemIndices($repeaterList);
-
-            });
-
-            // --- مدیریت جابجایی (SortableJS) ---
-            if (typeof Sortable === 'undefined') {
-                console.warn('Nader Settings JS: کتابخانه SortableJS در دسترس نیست. قابلیت جابجایی فعال نخواهد شد.');
-            } else {
-                Sortable.create($repeaterList[0], { // [0] برای گرفتن عنصر DOM اصلی از آبجکت jQuery
-                    handle: '.item-handle', // عنصر دستگیره برای کشیدن
-                    animation: 150, // سرعت انیمیشن جابجایی
-                    onUpdate: function (evt) {
-                        // هنگامی که ترتیب آیتم‌ها تغییر می‌کند، ایندکس‌ها را به‌روز کن.
-                        updateRepeaterItemIndices($repeaterList);
-                    },
-                    // اختیاری: callback هنگام شروع کشیدن (برای افزودن کلاس visual)
-                    // onStart: function (evt) { $(evt.item).addClass('is-dragging'); },
-                    // اختیاری: callback هنگام پایان کشیدن (برای حذف کلاس visual)
-                    // onEnd: function (evt) { $(evt.item).removeClass('is-dragging'); },
+            // به‌روزرسانی شماره آیتم‌ها
+            function reindexItems() {
+                $itemsContainer.children().each(function(index) {
+                    $(this)
+                        .attr('data-index', index)
+                        .find('.item-title').text(`آیتم ${index + 1}`);
                 });
             }
 
-            // اولیه سازی اولیه ایندکس‌ها و دکمه‌ها هنگام بارگذاری صفحه
-            updateRepeaterItemIndices($repeaterList);
+            // به‌روزرسانی وضعیت دکمه‌ها
+            function updateButtonStates() {
+                $addButton.toggle(maxItems === 0 || itemCount < maxItems);
+                $itemsContainer.find('.remove-item').prop(
+                    'disabled',
+                    itemCount <= minItems
+                );
+            }
 
+            // مقداردهی اولیه
+            updateButtonStates();
         });
     }
 
@@ -743,16 +684,8 @@ jQuery(document).ready(function($) {
             initializeWpEditors($searchContext); // اولیه سازی WP Editors در کانتینر فعلی
         }
 
-
-        // فعال کردن Repeater (فراخوانی اولیه سازی اصلی)
-        // این تابع نباید در هر بار initializeNaderSettingsModules اجرا شود، فقط یک بار برای کل صفحه.
-        // بنابراین، آن را خارج از این تابع صدا می‌زنیم، یا چک می‌کنیم که کانتینر کل صفحه باشد.
-        // منطق اولیه سازی repeater ها در تابع initializeRepeaters قرار داده شده است.
-
-        // اگر $container null بود، یعنی اولین بار برای کل صفحه صدا زده شده و initializeRepeaters را صدا بزن.
-        // اگر $container یک شیء jQuery بود، یعنی برای یک آیتم Repeater صدا زده شده و نیازی به صدا زدن مجدد initializeRepeaters نیست.
         if ($container === null) {
-            initializeRepeaters(); // فقط یک بار برای کل صفحه
+            initializeRepeaterFields($searchContext);
         }
     } // پایان initializeNaderSettingsModules
 
