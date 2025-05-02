@@ -435,15 +435,12 @@ final class Nader_Settings{
             ], 400);
         }
 
-        // ادغام تنظیمات جدید با تنظیمات موجود
-        $updated_settings = array_merge($all_settings, $processed_settings);
-
-        // اعتبارسنجی نهایی قبل از ذخیره
-        if (!$this->validate_final_data($updated_settings)) {
+        //         اعتبارسنجی نهایی قبل از ذخیره
+        if (!$this->validate_final_data($processed_settings)) {
             wp_send_json_error('داده‌های نامعتبر', 400);
         }
 
-        update_option(self::$settings_key, $updated_settings);
+        update_option(self::$settings_key, $processed_settings);
 
         // Log final data
 //        error_log('Nader Settings Final Saved Data: ' . print_r($updated_settings, true));
