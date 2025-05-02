@@ -689,6 +689,17 @@ jQuery(document).ready(function($) {
         });
     }
 
+    // مدیریت رویداد toggle برای آیتم‌های موجود و جدید
+    $(document).on('click', '.toggle-item', function() {
+        const $button = $(this);
+        const $content = $button.closest('.repeater-item').find('.item-content');
+
+        // نمایش/مخفی کردن محتوا با انیمیشن
+        $content.slideToggle(300, function() {
+            $button.text($content.is(':visible') ? '▲' : '▼');
+        });
+    });
+
     function initializeNaderSettingsModules($container) {
 
         if (!$container || $container.length === 0) {

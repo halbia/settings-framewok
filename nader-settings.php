@@ -363,97 +363,140 @@ final class Nader_Settings{
         <?php
     }
 
-    /**
-     * مدیریت درخواست AJAX برای ذخیره تنظیمات.
-     * در این متد، روی پیکربندی‌های ماژول ثبت شده حلقه می‌زنیم و آن‌ها را پردازش می‌کنیم.
-     */
-    public function save_settings()
-    {
-        // بررسی Nonce برای امنیت درخواست AJAX
+    public function save_settings() {
         check_ajax_referer('nader_settings_nonce', 'nonce');
 
-        // بررسی قابلیت کاربر برای انجام این عمل
         if (!current_user_can('manage_options')) {
-            // ارسال پاسخ خطای JSON با کد وضعیت HTTP 403 (Forbidden)
             wp_send_json_error('دسترسی غیرمجاز.', 403);
         }
 
-        // دریافت رشته سریالایز شده داده‌های فرم از درخواست POST
         $raw_data = $_POST['settings'] ?? '';
-
-
-        // --- قدم حیاتی: تجزیه رشته سریالایز شده به یک آرایه PHP ---
         parse_str($raw_data, $submitted_data);
-//        error_log(print_r($submitted_data,true)); // لاگ برای عیب‌یابی
 
-        // حذف فیلدهای کنترلی
-        unset($submitted_data["nader_nonce"]);
-        unset($submitted_data["_wp_http_referer"]);
-        unset($submitted_data["current_tab_id"]);
+        // حذف فیلدهای سیستمی
+        unset(
+            $submitted_data['nader_nonce'],
+            $submitted_data['_wp_http_referer'],
+            $submitted_data['current_tab_id']
+        );
 
+        $processed_settings = [];
+        $validation_errors = [];
+        $all_settings = get_option(self::$settings_key, []);
 
-        $processed_settings = []; // آرایه‌ای برای نگهداری داده‌های پردازش شده و معتبر
-        $validation_errors = [];  // آرایه‌ای برای نگهداری خطاهای اعتبارسنجی
-
-        // --- بررسی وجود پیکربندی ماژول‌های ثبت شده ---
-        if (empty($this->registered_module_configs)) {
-            error_log('Nader Settings AJAX Save Error: هیچ پیکربندی ماژولی ثبت نشده است.');
-            wp_send_json_error('خطای داخلی: پیکربندی ماژول‌ها در دسترس نیست.', 500);
-        }
-
-        // --- حلقه زدن روی پیکربندی‌های ماژول ثبت شده برای اعتبارسنجی و پردازش ---
-        // این ensures که ما از نام‌های صحیح فیلدها و پیکربندی‌های درست استفاده می‌کنیم.
         foreach ($this->registered_module_configs as $module_name => $module_config) {
-            // پیدا کردن نام کلاس ماژول بر اساس 'type' در پیکربندی (مثال: 'text' -> 'Nader_Text')
-            $module_class_name = 'Nader_' . str_replace(' ', '', ucwords(str_replace('-', ' ', $module_config['type'] ?? '')));
+            try {
+                $module_type = $module_config['type'];
+                $module_class = 'Nader_' . str_replace('-', '_', ucwords($module_type, '-'));
 
-            // بررسی اینکه آیا کلاس ماژول برای این نوع وجود دارد و از Nader_Module ارث می‌برد
-            if (!class_exists($module_class_name) || !is_subclass_of($module_class_name, 'Nader_Module')) {
-                error_log('Nader Settings AJAX Save Error: کلاس ماژول برای نوع "' . ($module_config['type'] ?? 'نامشخص') . '" (' . $module_class_name . ') یافت نشد یا از Nader_Module ارث نمی‌برد.');
-                // می‌توانیم این خطا را نادیده بگیریم یا یک خطای جدی‌تر ارسال کنیم. فعلاً ادامه می‌دهیم.
-                continue; // به ماژول بعدی می‌رویم
+                if (!class_exists($module_class) || !is_subclass_of($module_class, 'Nader_Module')) {
+                    error_log("Nader Settings: Invalid module class for {$module_type}");
+                    continue;
+                }
+
+                // پردازش ویژه برای Repeater
+                if ($module_type === 'repeater') {
+                    $module_instance = new $module_class($module_config);
+                    $result = $module_instance->handle_submission($submitted_data);
+
+                    if (!empty($result['errors'])) {
+                        $validation_errors = array_merge($validation_errors, $result['errors']);
+                    }
+
+                    $processed_settings = array_merge(
+                        $processed_settings,
+                        $this->normalize_repeater_data($result['processed_data'])
+                    );
+                    continue;
+                }
+
+                // پردازش استاندارد برای سایر ماژول‌ها
+                $module_instance = new $module_class($module_config);
+                $result = $module_instance->handle_submission($submitted_data);
+
+                if (!empty($result['errors'])) {
+                    $validation_errors = array_merge($validation_errors, $result['errors']);
+                }
+
+                $processed_settings = array_merge(
+                    $processed_settings,
+                    $result['processed_data']
+                );
+
+            } catch (Exception $e) {
+                error_log("Nader Settings Error processing {$module_name}: " . $e->getMessage());
             }
-
-            // نمونه‌سازی ماژول با استفاده از آرگومان‌های ثبت شده
-            // این ensure می‌کند که ماژول با نام، الزامی بودن، چندزبانه بودن و سایر تنظیمات صحیح ساخته شده است.
-            $module_instance = new $module_class_name($module_config);
-
-            // فراخوانی متد handle_submission بر روی این نمونه ماژول صحیح
-            // $submitted_data شامل تمام داده‌های ارسالی است و ماژول خودش داده‌های مربوط به خود را پیدا می‌کند.
-            $module_result = $module_instance->handle_submission($submitted_data);
-
-            // تجمیع داده‌های پردازش شده از ماژول
-            if (!empty($module_result['processed_data'])) {
-                $processed_settings = array_merge($processed_settings, $module_result['processed_data']);
-            }
-
-            // تجمیع خطاهای اعتبارسنجی از ماژول
-            if (!empty($module_result['errors'])) {
-                $validation_errors = array_merge($validation_errors, $module_result['errors']);
-            }
-            // پس از پردازش هر ماژول، نمونه آن دیگر نیاز نیست و از حافظه پاک می‌شود.
         }
 
-        // --- بررسی وجود خطاهای اعتبارسنجی تجمیع شده ---
         if (!empty($validation_errors)) {
             wp_send_json_error([
-                'message' => 'خطا در اعتبارسنجی فیلدها. لطفا موارد مشخص شده را بررسی کنید.',
-                'errors'  => $validation_errors
+                'message' => 'خطا در اعتبارسنجی فیلدها',
+                'errors' => $validation_errors
             ], 400);
         }
 
-        // --- اگر اعتبارسنجی تمام ماژول‌ها با موفقیت انجام شد، تنظیمات را در دیتابیس به‌روزرسانی کن ---
-        // تنظیمات موجود را بخوان تا تنظیمات سایر تب‌ها/ماژول‌ها که در فرم فعلی نیستند از بین نروند.
-        $all_settings = get_option(self::$settings_key, []);
-
-        // داده‌های پردازش شده جدید را با تنظیمات موجود ادغام کن.
+        // ادغام تنظیمات جدید با تنظیمات موجود
         $updated_settings = array_merge($all_settings, $processed_settings);
 
-        // ذخیره آرایه ترکیبی تنظیمات
+        // اعتبارسنجی نهایی قبل از ذخیره
+        if (!$this->validate_final_data($updated_settings)) {
+            wp_send_json_error('داده‌های نامعتبر', 400);
+        }
+
         update_option(self::$settings_key, $updated_settings);
 
-        // ارسال پاسخ موفقیت آمیز
-        wp_send_json_success('تنظیمات با موفقیت ذخیره شد!');
+        // Log final data
+        error_log('Nader Settings Final Saved Data: ' . print_r($updated_settings, true));
+
+        wp_send_json_success('تنظیمات با موفقیت ذخیره شدند');
+    }
+
+    // تابع کمکی برای نرمال‌سازی داده‌های Repeater
+    private function normalize_repeater_data(array $repeater_data): array {
+        $normalized = [];
+
+        foreach ($repeater_data as $key => $value) {
+            preg_match('/(.+?)\[(\d+)\]\[(.+?)\]/', $key, $matches);
+
+            if (count($matches) === 4) {
+                $field_name = $matches[1];
+                $index = $matches[2];
+                $sub_field = $matches[3];
+
+                $normalized[$field_name][$index][$sub_field] = $value;
+            }
+        }
+
+        // تبدیل به آرایه عددی
+        foreach ($normalized as $field => $items) {
+            $normalized[$field] = array_values($items);
+        }
+
+        return $normalized;
+    }
+
+    // تابع اعتبارسنجی نهایی
+    private function validate_final_data(array $data): bool {
+        foreach ($data as $key => $value) {
+            if (!is_string($key) || !$this->is_valid_key($key)) {
+                error_log("Nader Settings: Invalid key format - {$key}");
+                return false;
+            }
+
+            if (is_array($value)) {
+                foreach ($value as $nested) {
+                    if (!is_array($nested) && !is_scalar($nested)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    // بررسی فرمت کلیدهای مجاز
+    private function is_valid_key(string $key): bool {
+        return preg_match('/^[a-z0-9_\-\[\]]+$/i', $key) === 1;
     }
 
     /**
