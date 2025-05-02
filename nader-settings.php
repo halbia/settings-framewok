@@ -327,24 +327,27 @@ final class Nader_Settings{
             if (!empty($this->tabs)) {
                 // تب درخواستی یافت نشد، به اولین تب برگرد.
                 $this->current_tab_id = array_key_first($this->tabs);
-                // می‌توانید به تب اول ریدایرکت کنید یا پیام خطا نمایش دهید.
-                // فعلاً فقط current_tab_id را تنظیم می‌کنیم.
             } else {
                 // اصلاً تبی ثبت نشده است.
                 wp_die('هیچ تبی برای تنظیمات این پلاگین ثبت نشده است.');
             }
         }
 
-        $current_tab_data = $this->tabs[$this->current_tab_id]; // دریافت اطلاعات تب فعلی
-
         ?>
-        <div class="nader-settings-wrap">
-            <h1><?php echo 'تنظیمات نادر'; // به جای get_admin_page_title() برای استفاده از متن ثابت فارسی
-                ?></h1>
+        <div class="nader-notice-area"></div>
+        <form id="nader-settings-form" class="nader-settings-wrap" method="post">
 
-            <div class="nader-header">
-                <h2 class="nader-page-title wp-heading-inline"><?php echo esc_html($current_tab_data['title']) ?></h2>
-                <div class="header-actions">
+
+            <div class="nader-settings-header">
+                <h2>تنظیمات قالب نادر</h2>
+                <div class="actions">
+                    <span class="spinner"></span>
+                    <button type="submit" class="button button-primary save-settings">
+                        ذخیره تغییرات
+                    </button>
+                    <button type="button" class="button button-secondary reset-settings">
+                        بازنشانی
+                    </button>
                 </div>
             </div>
 
@@ -367,8 +370,8 @@ final class Nader_Settings{
                 </nav>
 
                 <div class="nader-tab-content">
-                    <form id="nader-settings-form" method="post">
-                        <?php
+
+                    <?php
                         // فیلد Nonce برای امنیت فرم
                         wp_nonce_field('nader_settings_nonce', 'nader_nonce');
                         // فیلد مخفی برای ارسال شناسه تب فعلی با فرم (اختیاری)
@@ -381,19 +384,9 @@ final class Nader_Settings{
                             do_action("nader_settings_tab_{$this->current_tab_id}", $this);
                             ?>
                         </div>
-                        <div class="nader-form-footer">
-                            <button type="submit" class="button button-primary save-settings">
-                                ذخیره تغییرات
-                            </button>
-                            <button type="button" class="button button-secondary reset-settings">
-                                بازنشانی
-                            </button>
-                            <span class="spinner"></span></div>
-                    </form>
                 </div>
             </div>
-            <div class="nader-notice-area"></div>
-        </div>
+        </form>
         <?php
     }
 

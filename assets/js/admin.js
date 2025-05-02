@@ -267,7 +267,7 @@ jQuery(document).ready(function($) {
         const $fieldContainer = $button.closest('.nader-gallery-field');
         const $galleryIdsInput = $fieldContainer.find('.nader-gallery-ids-input');
         const $galleryPreviewList = $fieldContainer.find('.nader-gallery-preview');
-        const $clearButton = $fieldContainer.find('.nader-clear-gallery-button');
+        let $clearButton = $fieldContainer.find('.nader-clear-gallery-button');
 
         const currentIdsString = $galleryIdsInput.val();
         const currentIdsArray = currentIdsString ? currentIdsString.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id) && id > 0) : [];
@@ -361,6 +361,7 @@ jQuery(document).ready(function($) {
             return;
         }
         // در کانتینر مشخص شده (یا کل صفحه)، inputهایی با کلاس مخصوص را پیدا کن و Color Picker را متصل کن.
+
         $container.find('input.nader-color-picker').not('.wp-color-picker').each(function() {
             const $input = $(this);
             $input.wpColorPicker();
@@ -761,9 +762,4 @@ jQuery(document).ready(function($) {
     initializeNaderSettingsModules(null); // null برای اولیه سازی در کل صفحه
 
 
-    // اگر تب‌ها با AJAX بارگذاری می‌شوند (در حال حاضر اینطور نیست)،
-    // باید این تابع initializeNaderSettingsModules را پس از بارگذاری محتوای تب جدید دوباره فراخوانی کنید.
-
-
 }); // پایان document ready
-

@@ -203,7 +203,7 @@ abstract class Nader_Module {
     protected function render_language_label(string $lang): void {
         // می‌توانید عنوان زبان را به عنوان اصلی اضافه کنید یا فقط کد زبان را نمایش دهید
         // مثال: 'عنوان سایت (FA)'
-        $label_text = sprintf('%s (%s)', esc_html($this->args['title']), strtoupper(esc_html($lang)));
+        $label_text = strtoupper(esc_html($lang));
 
         echo '<label class="nader-lang-label">';
         echo $label_text;

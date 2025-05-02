@@ -20,7 +20,6 @@ $nader_settings = Nader_Settings::instance();
 $nader_settings->register_tab([
     'id'    => 'general', // شناسه منحصر به فرد تب
     'title' => 'تنظیمات عمومی (نمونه‌ها)', // عنوان تب نمایش داده شده در UI
-    'icon'  => 'dashicons-admin-generic', // آیکون تب (اختیاری)
     'order' => 5 // ترتیب نمایش تب (اعداد کمتر جلوتر نمایش داده می‌شوند)
 ]);
 
@@ -239,65 +238,12 @@ $nader_settings->register_module_config([
     'multiple'    => false, // یا true برای انتخاب چند تصویر
     'type'        => 'image_select', // <-- نوع ماژول
     'options'     => [
-        'layout_left_simple'  => NAD_SETTINGS_URL . 'assets/images/layout-left-sidebar.png',
-        'layout_right_simple' => NAD_SETTINGS_URL . 'assets/images/layout-right-sidebar.png',
-        'layout_full_simple'  => NAD_SETTINGS_URL . 'assets/images/layout-full-width.png',
+        'layout_left_simple'  => 'http://nader2mo.test/wp-content/uploads/2025/04/04f7f08065849a994ea5c4edea017cd4.jpg',
+        'layout_right_simple' => 'http://nader2mo.test/wp-content/uploads/2025/04/04f7f08065849a994ea5c4edea017cd4.jpg',
+        'layout_full_simple'  => 'http://nader2mo.test/wp-content/uploads/2025/04/04f7f08065849a994ea5c4edea017cd4.jpg',
     ],
     'default'     => 'layout_right_simple', // مقدار پیش‌فرض (value)
 ]);
-
-
-$nader_settings->register_module_config([
-    'name'        => 'demo_sections_repeater',
-    'title'       => 'بخش‌های صفحه',
-    'description' => 'افزودن بخش‌های مختلف به صفحه.',
-    'required'    => false,
-    'multilang'   => false, // Repeater تک زبانه
-    'type'        => 'repeater', // <-- نوع ماژول
-    'button_text' => 'افزودن بخش جدید',
-    'min_items'   => 0, // حداقل 0 آیتم
-    'max_items'   => 5, // حداکثر 5 آیتم
-    'sub_fields'  => [ // <-- تعریف زیرفیلدها
-                       [
-                           'name'        => 'section_title',
-                           'title'       => 'عنوان بخش',
-                           'type'        => 'text', // استفاده از ماژول Text
-                           'required'    => true, // این زیرفیلد در هر آیتم الزامی است
-                           'placeholder' => 'عنوان بخش را وارد کنید...',
-                       ],
-                       [
-                           'name'        => 'section_image',
-                           'title'       => 'تصویر بخش',
-                           'type'        => 'image', // استفاده از ماژول Image
-                           'required'    => false,
-                           'button_text' => 'انتخاب تصویر بخش',
-                       ],
-                       [
-                           'name'     => 'section_content',
-                           'title'    => 'محتوای بخش',
-                           'type'     => 'textarea', // استفاده از ماژول Textarea
-                           'required' => false,
-                           'rows'     => 5,
-                       ],
-                       [
-                           'name'         => 'section_color',
-                           'title'        => 'رنگ پس‌زمینه بخش',
-                           'type'         => 'color', // استفاده از ماژول Color
-                           'default'      => '#f0f0f0',
-                           'enable_alpha' => false,
-                       ],
-                       [
-                           'name'        => 'section_item_post',
-                           'title'       => 'انتخاب نوشته مرتبط',
-                           'type'        => 'choose', // استفاده از ماژول Choose
-                           'multiple'    => false,
-                           'query'       => ['type' => 'post', 'post_type' => 'post'],
-                           'placeholder' => 'نوشته‌ای را انتخاب کنید...',
-                       ]
-    ],
-]);
-
-// --- پایان ثبت پیکربندی ماژول‌ها ---
 
 
 // 2. تعریف محتوای تب عمومی برای رندر کردن
@@ -511,66 +457,13 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
         // سایر آرگومان‌ها مطابق با register_module_config
         'multiple'    => false,
         'options'     => [
-            'layout_left_simple'  => NAD_SETTINGS_URL . 'assets/images/layout-left-sidebar.png',
-            'layout_right_simple' => NAD_SETTINGS_URL . 'assets/images/layout-right-sidebar.png',
-            'layout_full_simple'  => NAD_SETTINGS_URL . 'assets/images/layout-full-width.png',
+            'layout_left_simple'  => 'http://nader2mo.test/wp-content/uploads/2025/04/04f7f08065849a994ea5c4edea017cd4.jpg',
+            'layout_right_simple' => 'http://nader2mo.test/wp-content/uploads/2025/04/04f7f08065849a994ea5c4edea017cd4.jpg',
+            'layout_full_simple'  => 'http://nader2mo.test/wp-content/uploads/2025/04/04f7f08065849a994ea5c4edea017cd4.jpg',
         ],
         'default'     => 'layout_right_simple',
     ]);
     $image_select_url_simple_field->render();
     echo '<hr>'; // جداکننده
-
-    // جدید: رندر ماژول Repeater
-    $sections_repeater_field = new Nader_Repeater([
-        'name'        => 'demo_sections_repeater',
-        'title'       => 'بخش‌های صفحه',
-        'description' => 'افزودن بخش‌های مختلف به صفحه.',
-        // سایر آرگومان‌ها مطابق با register_module_config
-        'button_text' => 'افزودن بخش جدید',
-        'min_items'   => 0,
-        'max_items'   => 5,
-        'sub_fields'  => [ // <-- تعریف زیرفیلدها (همانند register_module_config)
-                           [
-                               'name'        => 'section_title',
-                               'title'       => 'عنوان بخش',
-                               'type'        => 'text',
-                               'required'    => true,
-                               'placeholder' => 'عنوان بخش را وارد کنید...',
-                           ],
-                           [
-                               'name'        => 'section_image',
-                               'title'       => 'تصویر بخش',
-                               'type'        => 'image',
-                               'required'    => false,
-                               'button_text' => 'انتخاب تصویر بخش',
-                           ],
-                           [
-                               'name'        => 'section_content',
-                               'title'       => 'محتوای بخش',
-                               'type'        => 'textarea',
-                               'required'    => false,
-                               'rows'        => 5,
-                           ],
-                           [
-                               'name'       => 'section_color',
-                               'title'      => 'رنگ پس‌زمینه بخش',
-                               'type'       => 'color',
-                               'default'    => '#f0f0f0',
-                               'enable_alpha' => false,
-                           ],
-                           [
-                               'name'      => 'section_item_post',
-                               'title'     => 'انتخاب نوشته مرتبط',
-                               'type'      => 'choose',
-                               'multiple'  => false,
-                               'query'     => ['type' => 'post', 'post_type' => 'post'],
-                               'placeholder' => 'نوشته‌ای را انتخاب کنید...',
-                           ]
-        ],
-    ]);
-    $sections_repeater_field->render();
-
-
-    // ... می‌توانید ماژول‌های دیگر را نیز در اینجا رندر کنید ...
 
 }, 10, 1); // پایان add_action برای تب عمومی

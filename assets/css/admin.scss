@@ -26,58 +26,65 @@ $spacing-xl: 32px;
 
 
 .nader-settings-wrap {
-  margin-top: $spacing-lg;
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  color: $material-text-primary;
+  display:        flex;
+  flex-direction: column;
+  font-family:    Arial, sans-serif;
+  margin:         15px;
+  background:     $material-background;
 }
 
 .nader-settings-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         1.5rem 1rem;
+  background:      #ffffff;
+  border-bottom:   1px solid #eee;
+
+  .spinner {
+	float: unset;
+  }
+
   h2 {
-	margin: 0 0 $spacing-md 0;
+	margin:      0;
 	padding: 0;
-	font-size: 1.5rem;
-	font-weight: normal;
+	font-size:   1.2rem;
+	font-weight: bold;
   }
 }
 
-.nader-settings-tabs {
-  margin-bottom: $spacing-md;
+.nader-settings-body {
+  display:               grid;
+  grid-template-columns: 200px 1fr;
+
+  .nader-tab-content {
+	padding:      1rem;
+	background:   #fff;
+	border-right: 1px solid #eee;
+  }
+
 }
 
-.nav-tab-wrapper {
-  border-bottom: 1px solid $material-border;
-  padding-bottom: 0;
-  margin-bottom: 0;
-  display: flex; // Use flexbox for better alignment
+.nader-tabs-nav {
+  padding:    0;
+  margin:     0;
+  width:      200px;
+  background: #fafafa;
 
-  .nav-tab {
-	border: none;
-	box-shadow: none;
-	background: transparent;
-	margin-bottom: -1px;
-	padding: $spacing-sm $spacing-md;
-	font-size: 0.875rem;
-	font-weight: 500;
-	text-transform: uppercase;
-	color: $material-text-secondary;
-	transition: color 0.3s ease, background-color 0.3s ease;
+  a {
+	display:         flex;
+	align-items:     center;
+	text-decoration: none;
+	padding:         .75rem 1rem;
+	cursor:          pointer;
+	border-bottom:   1px solid #eee;
+	transition:      background .2s;
+	margin-bottom:   0;
+	color:           $material-secondary-variant;
 
-	&:hover {
-	  color: $material-text-primary;
-	  background-color: rgba($material-primary, 0.04);
-	  border-color: transparent;
-	}
-
-	&.nav-tab-active {
-	  color: $material-primary;
-	  border-bottom: 2px solid $material-primary;
-	  background-color: rgba($material-primary, 0.08);
-	  font-weight: 500;
-	}
-
-	margin-right: $spacing-sm;
-	&:last-child {
-	  margin-right: 0;
+	&.active {
+	  background:  #fff;
+	  font-weight: bold;
 	}
   }
 }
@@ -101,78 +108,8 @@ $spacing-xl: 32px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-.nader-footer {
-  margin-top: $spacing-lg;
-  padding: $spacing-md 0;
-  border-top: 1px solid $material-border;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .spinner {
-	margin: 0 $spacing-sm;
-	visibility: hidden;
-	&.is-active {
-	  visibility: visible;
-	}
-  }
-
-  .button-primary {
-	background-color: $material-primary;
-	color: $material-on-primary;
-	border: none;
-	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.20);
-	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-	&:hover, &:focus {
-	  background-color: $material-primary-variant;
-	  box-shadow: 0 3px 4px 0 rgba(0,0,0,0.14), 0 3px 3px -2px rgba(0,0,0,0.12), 0 1px 8px 0 rgba(0,0,0,0.20);
-	}
-
-	&:active {
-	  box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.20);
-	}
-
-	&:disabled {
-	  background-color: rgba(0,0,0,0.12);
-	  color: rgba(0,0,0,0.38);
-	  box-shadow: none;
-	}
-  }
-
-  .button-secondary {
-	background-color: transparent;
-	color: $material-primary;
-	border: 1px solid $material-primary;
-	box-shadow: none;
-
-	&:hover, &:focus {
-	  background-color: rgba($material-primary, 0.04);
-	  color: $material-primary-variant;
-	  border-color: $material-primary-variant;
-	}
-
-	&:active {
-	  background-color: rgba($material-primary, 0.12);
-	  color: $material-primary-variant;
-	  border-color: $material-primary-variant;
-	}
-
-	&:disabled {
-	  color: rgba(0,0,0,0.38);
-	  border-color: rgba(0,0,0,0.12);
-	  background-color: transparent;
-	}
-  }
-}
-
 .nader-field-wrapper {
   margin-bottom: $spacing-lg;
-  padding: $spacing-md;
-  border: none;
-  background: $material-surface;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 1px 1px rgba(0,0,0,0.16);
 
   &.has-error {
 	box-shadow: 0 1px 3px rgba($material-error, 0.2), 0 1px 2px rgba($material-error, 0.4);
@@ -183,13 +120,14 @@ $spacing-xl: 32px;
 
   .nader-field-label {
 	display: block;
-	font-weight: 500;
-	margin-bottom: $spacing-xs;
+	font-weight:   bold;
+	margin-bottom: $spacing-sm;
 	color: $material-text-primary;
-	.required {
-	  color: $material-error;
-	  margin-right: $spacing-xs;
-	}
+  }
+
+  .required {
+	color:        $material-error;
+	margin-right: $spacing-sm;
   }
 
   .description {
@@ -219,8 +157,8 @@ $spacing-xl: 32px;
 	border-color: $material-error;
   }
 
-  .lang-label {
-	font-weight: 500;
+  label {
+	font-weight: bold;
 	margin-bottom: $spacing-sm;
 	display: block;
 	color: $material-text-primary;
@@ -243,6 +181,8 @@ textarea.nader-textarea-input,
   background-color: $material-surface;
   color: $material-text-primary;
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  text-align: right;
+  direction:  rtl;
 
   &:focus {
 	border-color: $material-primary;
@@ -256,15 +196,15 @@ textarea.nader-textarea-input,
   }
 
   &[readonly] {
-	background-color: rgba(0,0,0,0.04);
-	cursor: default;
+	background-color: rgba(0, 0, 0, 0.04);
+	cursor:           default;
   }
 
   &:disabled {
-	background-color: rgba(0,0,0,0.06);
-	color: $material-text-disabled;
-	cursor: not-allowed;
-	border-color: rgba(0,0,0,0.12);
+	background-color: rgba(0, 0, 0, 0.06);
+	color:            $material-text-disabled;
+	cursor:           not-allowed;
+	border-color:     rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -278,12 +218,14 @@ textarea.nader-textarea-input {
 .nader-gallery-field {
   .nader-image-preview {
 	margin-top: $spacing-sm;
+
 	img {
 	  max-width: 150px;
 	  height: auto;
 	  display: block;
 	  border: 1px solid $material-border;
 	  border-radius: 4px;
+
 	  &.error-border {
 		border-color: $material-error;
 	  }
@@ -306,34 +248,39 @@ textarea.nader-textarea-input {
 	  border: 1px solid $material-border;
 	  border-radius: 4px;
 	  background: $material-surface;
+
 	  img {
 		display: block;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 	  }
+
 	  .remove-image-button {
-		position: absolute;
-		top: $spacing-xs;
-		right: $spacing-xs;
+		position:   absolute;
+		top:        $spacing-xs;
+		right:      $spacing-xs;
 		background: rgba(255, 255, 255, 0.8);
-		border: none;
-		padding: $spacing-xs;
-		cursor: pointer;
+		border:     none;
+		padding:    $spacing-xs;
+		cursor:     pointer;
 		line-height: 1;
 		border-radius: 50%;
-		box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
 		.dashicons {
 		  font-size: 18px;
 		  color: $material-error;
 		}
+
 		&:hover {
 		  background: $material-surface;
-		  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+		  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 		}
 	  }
 	}
   }
+
   .nader-select-image-button,
   .nader-remove-image-button,
   .nader-select-gallery-button,
@@ -352,9 +299,11 @@ textarea.nader-textarea-input {
 	  display: inline-block;
 	}
   }
+
   label {
 	display: block;
 	margin-bottom: $spacing-xs;
+
 	input {
 	  margin-left: $spacing-xs;
 	  margin-right: 0;
@@ -381,6 +330,38 @@ textarea.nader-textarea-input {
   }
 }
 
+.nader-image-select-list {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       $spacing-sm;
+
+  .image-option {
+	width:         60px;
+	height:        60px;
+	border:        2px solid transparent;
+	transition:    border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	cursor: pointer;
+
+	&.selected {
+	  border-color: $material-primary;
+	  box-shadow:   0 0 0 1px $material-primary;
+	}
+
+	&:hover {
+	  border-color: rgba($material-primary, 0.6);
+	}
+
+	img {
+	  width: 100%;
+	}
+
+	.no-image-placeholder {
+	  font-size: 0.7em;
+	}
+  }
+}
+
+
 .nader-color-picker {
 }
 
@@ -393,14 +374,14 @@ textarea.nader-textarea-input {
 .nader-toggle-switch {
   position: relative;
   display: inline-block;
-  width: 36px;
-  height: 20px;
+  width:  60px;
+  height: 30px;
   background-color: $material-text-secondary;
   transition: background-color 0.3s ease-in-out;
   border-radius: 10px;
   cursor: pointer;
   vertical-align: middle;
-  top: 2px;
+  top:    2px;
 
   input[type="checkbox"] {
 	opacity: 0;
@@ -410,26 +391,26 @@ textarea.nader-textarea-input {
   }
 
   .slider {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	position:      absolute;
+	top:           0;
+	left:          0;
+	right:         0;
+	bottom:        0;
 	background-color: inherit;
-	transition: 0.3s;
-	border-radius: 10px;
+	transition:    0.3s;
+	border-radius: 4px;
 
 	&::before {
-	  position: absolute;
-	  content: "";
-	  height: 16px;
-	  width: 16px;
-	  left: 2px;
-	  bottom: 2px;
-	  background-color: $material-surface;
-	  transition: 0.3s transform, 0.3s background-color;
-	  border-radius: 50%;
-	  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	  position:         absolute;
+	  content:          "";
+	  height:           24px;
+	  width:            24px;
+	  left:             3px;
+	  bottom:           3px;
+	  background-color: #fff;
+	  transition:       0.3s transform, 0.3s background-color;
+	  border-radius:    4px;
+	  box-shadow:       0 1px 3px rgba(0, 0, 0, 0.4);
 	}
   }
 
@@ -438,7 +419,7 @@ textarea.nader-textarea-input {
   }
 
   input:checked + .slider::before {
-	transform: translateX(16px);
+	transform: translateX(30px);
 	background-color: $material-secondary-variant;
   }
 }
@@ -462,10 +443,12 @@ textarea.nader-textarea-input {
 		color: $material-text-primary;
 		padding: 0;
 	  }
+
 	  .select2-selection__arrow {
 		height: 38px;
 		right: $spacing-sm;
 	  }
+
 	  .select2-selection__placeholder {
 		color: $material-text-secondary;
 	  }
@@ -485,26 +468,31 @@ textarea.nader-textarea-input {
 		padding: 0;
 		line-height: normal;
 	  }
+
 	  .select2-search__field {
 		height: 28px;
 		line-height: 28px;
 		margin: $spacing-xs 0;
 		padding: 0 $spacing-sm;
 		color: $material-text-primary;
+
 		&::placeholder {
 		  color: $material-text-secondary;
 		}
 	  }
+
 	  .select2-selection__choice {
 		background-color: rgba($material-primary, 0.08);
-		border: none;
-		border-radius: 16px;
-		padding: $spacing-xs $spacing-sm;
-		margin: $spacing-xs $spacing-xs 0 0;
-		color: $material-text-primary;
+		border:        none;
+		border-radius: 4px;
+		padding:       $spacing-xs $spacing-sm;
+		margin:        $spacing-xs $spacing-xs 0 0;
+		color:         $material-text-primary;
+
 		.select2-selection__choice__remove {
 		  margin-left: $spacing-xs;
 		  color: $material-text-secondary;
+
 		  &:hover {
 			color: $material-text-primary;
 		  }
@@ -527,6 +515,14 @@ textarea.nader-textarea-input {
 		box-shadow: 0 0 0 1px $material-error !important;
 	  }
 	}
+
+	.select2-selection__clear {
+	  font-size:    16px;
+	  color:        $material-error;
+	  margin-left:  10px;
+	  margin-right: 0;
+	  float:        right !important;
+	}
   }
 }
 
@@ -545,20 +541,20 @@ textarea.nader-textarea-input {
 
 .nader-repeater-item {
   border-bottom: none;
-  padding: $spacing-md;
+  padding:    $spacing-md;
   margin-bottom: $spacing-sm;
   background: $material-surface;
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 
   &:last-child {
 	margin-bottom: 0;
   }
 
   &.sortable-chosen {
-	opacity: 0.6;
-	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-	cursor: grabbing;
+	opacity:    0.6;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	cursor:     grabbing;
   }
 
   &.sortable-ghost {
@@ -597,6 +593,7 @@ textarea.nader-textarea-input {
 	cursor: grab;
 	margin-left: $spacing-sm;
 	color: $material-text-secondary;
+
 	&:hover {
 	  color: $material-text-primary;
 	}
@@ -612,6 +609,7 @@ textarea.nader-textarea-input {
 	font-size: 18px;
 	line-height: 1;
 	transition: color 0.2s ease-in-out;
+
 	&:hover {
 	  color: $material-error;
 	}
@@ -622,6 +620,7 @@ textarea.nader-textarea-input {
 	margin-left: $spacing-sm;
 	color: $material-text-secondary;
 	transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+
 	&:hover {
 	  color: $material-text-primary;
 	}
@@ -634,7 +633,7 @@ textarea.nader-textarea-input {
   .nader-repeater-sub-field-wrapper {
 	padding: $spacing-md;
 	margin-bottom: $spacing-md;
-	border: 1px dashed rgba(0,0,0,0.08);
+	border: 1px dashed rgba(0, 0, 0, 0.08);
 	background: rgba($material-primary, 0.02);
 	border-radius: 4px;
 
@@ -645,33 +644,14 @@ textarea.nader-textarea-input {
 	.nader-field-label {
 	  font-size: 0.875rem;
 	}
+
 	.description {
 	  font-size: 0.8rem;
 	}
 
-
-	.nader-image-select-list {
-	  gap: $spacing-sm;
-	  .image-option {
-		width: 60px;
-		height: 60px;
-		border: 2px solid transparent;
-		border-radius: 4px;
-		transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-		&.selected {
-		  border-color: $material-secondary;
-		  box-shadow: 0 0 0 1px $material-secondary;
-		}
-		&:hover {
-		  border-color: rgba($material-secondary, 0.6);
-		}
-		.no-image-placeholder {
-		  font-size: 0.7em;
-		}
-	  }
-	}
 	.nader-range-slider-field {
 	  gap: $spacing-sm;
+
 	  .nader-number-input {
 		width: 60px;
 		padding: $spacing-xs;
@@ -679,38 +659,46 @@ textarea.nader-textarea-input {
 		border-radius: 4px;
 	  }
 	}
+
 	.nader-toggle-field {
 	  margin-top: 0;
 	}
 
 	input[type="text"], input[type="number"], input[type="email"], input[type="url"], input[type="password"], textarea.nader-textarea-input, .nader-text-input {
-	  padding: $spacing-sm;
-	  border-color: rgba(0,0,0,0.08);
+	  padding:      $spacing-sm;
+	  border-color: rgba(0, 0, 0, 0.08);
+
 	  &:focus {
 		border-color: $material-primary;
 		box-shadow: 0 0 0 1px $material-primary;
 	  }
+
 	  &.has-error {
 		border-color: $material-error !important;
 		box-shadow: 0 0 0 1px $material-error !important;
 	  }
 	}
+
 	.nader-color-picker input.nader-color-picker {
-	  border-color: rgba(0,0,0,0.08);
+	  border-color: rgba(0, 0, 0, 0.08);
+
 	  &:focus {
 		border-color: $material-primary;
 		box-shadow: 0 0 0 1px $material-primary;
 	  }
+
 	  &.has-error {
 		border-color: $material-error !important;
 		box-shadow: 0 0 0 1px $material-error !important;
 	  }
 	}
+
 	.nader-field-choose .select2-container {
 	  .select2-selection--single,
 	  .select2-selection--multiple {
-		border-color: rgba(0,0,0,0.08);
+		border-color: rgba(0, 0, 0, 0.08);
 	  }
+
 	  &.select2-container--focus {
 		.select2-selection--single,
 		.select2-selection--multiple {
@@ -718,6 +706,7 @@ textarea.nader-textarea-input {
 		  box-shadow: 0 0 0 1px $material-primary !important;
 		}
 	  }
+
 	  &.has-error-select2 {
 		.select2-selection {
 		  border-color: $material-error !important;
@@ -749,7 +738,7 @@ textarea.nader-textarea-input {
   }
 
   &:disabled {
-	color: rgba(0,0,0,0.38);
+	color: rgba(0, 0, 0, 0.38);
 	background-color: transparent;
   }
 
@@ -792,14 +781,17 @@ hr {
 	box-shadow: none !important;
 	background-color: $material-surface;
   }
+
   .mce-toolbar {
 	background-color: $material-surface !important;
 	border-bottom-color: $material-border !important;
   }
+
   .mce-statusbar {
 	background-color: $material-surface !important;
 	border-top-color: $material-border !important;
   }
+
   .mce-path {
 	color: $material-text-secondary !important;
   }
@@ -808,14 +800,16 @@ hr {
 .nader-repeater-sub-field-wrapper {
   .wp-editor-wrap {
 	margin-bottom: 0;
-	border-color: rgba(0,0,0,0.08) !important;
-	box-shadow: none !important;
+	border-color: rgba(0, 0, 0, 0.08) !important;
+	box-shadow:   none !important;
+
 	textarea.wp-editor-area {
 	  background-color: $material-surface; // Use material surface
 	}
+
 	.mce-panel, .mce-toolbar, .mce-statusbar {
 	  background-color: $material-surface !important; // Use material surface
-	  border-color: rgba(0,0,0,0.08) !important;
+	  border-color: rgba(0, 0, 0, 0.08) !important;
 	}
   }
 }
