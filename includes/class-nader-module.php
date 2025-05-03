@@ -71,8 +71,8 @@ abstract class Nader_Module {
 
         $this->render_field_wrapper_start($field_name); // شروع wrapper فیلد
         $this->render_field_label(); // رندر عنوان فیلد
-        $this->render_field($field_name, $current_value); // متد انتزاعی که توسط کلاس‌های فرزند پیاده‌سازی می‌شود
         $this->render_description(); // رندر توضیحات
+        $this->render_field($field_name, $current_value); // متد انتزاعی که توسط کلاس‌های فرزند پیاده‌سازی می‌شود
         // اصلاحیه: ارسال نام فیلد به تابع render_errors()
         $this->render_errors($field_name); // رندر Placeholder برای خطاها (توسط JS پر می‌شود)
         $this->render_field_wrapper_end(); // پایان wrapper فیلد
@@ -90,6 +90,7 @@ abstract class Nader_Module {
 
         // رندر عنوان اصلی برای گروه چندزبانه
         $this->render_field_label();
+        $this->render_description();
 
         // کانتینر برای فیلدهای هر زبان
         echo '<div class="nader-multilang-fields">';
@@ -109,7 +110,6 @@ abstract class Nader_Module {
         echo '</div>'; // پایان کانتینر فیلدهای زبان
 
         // رندر توضیحات مشترک پس از تمام فیلدها
-        $this->render_description();
 
         $this->render_field_wrapper_end(); // پایان wrapper اصلی برای گروه چندزبانه
     }
