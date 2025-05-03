@@ -245,15 +245,6 @@ $nader_settings->register_module_config([
     'default'     => 'layout_right_simple', // مقدار پیش‌فرض (value)
 ]);
 
-$nader_settings->register_module_config([
-    'name'   => 'team',
-    'type' => 'repeater',
-    'fields' => [
-        ['name' => 'name', 'type' => 'text', 'title' => 'نام'],
-        ['name' => 'photo', 'type' => 'image', 'title' => 'عکس'],
-        ['name' => 'color', 'type' => 'color', 'title' => 'رنگ']
-    ]
-]);
 
 
 // 2. تعریف محتوای تب عمومی برای رندر کردن
@@ -487,15 +478,5 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
     $image_select_url_simple_field->render();
     echo '<hr>'; // جداکننده
 
-    // رندر فیلد
-    $repeater = new Nader_Repeater([
-        'name' => 'team',
-        'fields' => [
-            ['name' => 'name', 'type' => 'text', 'title' => 'نام'],
-            ['name' => 'photo', 'type' => 'image', 'title' => 'عکس'],
-            ['name' => 'color', 'type' => 'color', 'title' => 'رنگ']
-        ]
-    ]);
-    $repeater->render();
 
 }, 10, 1); // پایان add_action برای تب عمومی

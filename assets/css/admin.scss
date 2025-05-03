@@ -670,3 +670,18 @@ hr {
 	border-radius: $spacing-xs;
   }
 }
+
+/* مخفی کردن تب‌های غیرفعال */
+.nader-tab-pane {
+  display: none;
+}
+
+.nader-tab-pane.active {
+  display: block;
+}
+
+/* استایل ناوبری تب‌ها */
+.nader-tabs-nav a {
+  cursor:     pointer;
+  transition: all 0.3s ease;
+}

@@ -291,14 +291,10 @@ final class Nader_Settings{
         // تعیین تب فعلی بر اساس پارامتر 'tab' در URL یا پیش‌فرض به اولین تب
         $this->current_tab_id = $_GET['tab'] ?? array_key_first($this->tabs);
 
-        // اعتبارسنجی تب درخواستی
         if (empty($this->tabs) || !isset($this->tabs[$this->current_tab_id])) {
-            // اگر تب درخواستی وجود نداشت یا هیچ تبی ثبت نشده بود
             if (!empty($this->tabs)) {
-                // تب درخواستی یافت نشد، به اولین تب برگرد.
                 $this->current_tab_id = array_key_first($this->tabs);
             } else {
-                // اصلاً تبی ثبت نشده است.
                 wp_die('هیچ تبی برای تنظیمات این پلاگین ثبت نشده است.');
             }
         }
@@ -323,37 +319,33 @@ final class Nader_Settings{
 
             <div class="nader-settings-body">
                 <nav class="nader-tabs-nav">
-                    <?php foreach ($this->tabs as $tab_id => $tab) :
-                        // ساخت URL تب، حذف پارامتر پیش‌فرض 'settings-updated' وردپرس
-                        $tab_url = add_query_arg('tab', $tab_id, remove_query_arg('settings-updated'));
-                        // حذف سایر پارامترهای مربوط به وضعیت یا خطاها اگر وجود دارند
-                        $tab_url = remove_query_arg(['message', 'type'], $tab_url);
-                        ?>
-                        <a href="<?php echo esc_url($tab_url) ?>"
-                           class="nader-tab <?php echo $tab_id === $this->current_tab_id ? 'active' : '' ?>">
-                            <?php if (!empty($tab['icon'])) : ?>
+                    <?php
+                    foreach ($this->tabs as $tab_id => $tab) {
+
+                    }
+
+                    foreach ($this->tabs as $tab_id => $tab) {
+                        $active_class = ($tab_id === $this->current_tab_id) ? ' active' : '';
+                        echo '<a href="#' . esc_attr($tab_id) . '" class="nader-tab' . $active_class . '" data-tab="' . esc_attr($tab_id) . '">';
+                        if (!empty($tab['icon'])) { ?>
                                 <span class="dashicons <?php echo esc_attr($tab['icon']) ?>"></span>
-                            <?php endif; ?>
-                            <?php echo esc_html($tab['title']) ?>
-                        </a>
-                    <?php endforeach; ?>
+                        <?php }
+                        echo esc_html($tab['title']);
+                        echo '</a>';
+                    } ?>
                 </nav>
 
                 <div class="nader-tab-content">
-
                     <?php
-                        // فیلد Nonce برای امنیت فرم
-                        wp_nonce_field('nader_settings_nonce', 'nader_nonce');
-                        // فیلد مخفی برای ارسال شناسه تب فعلی با فرم (اختیاری)
-                        // <input type="hidden" name="current_tab_id" value="<?php echo esc_attr($this->current_tab_id); ">
-                        ?>
-                        <div class="nader-settings-fields">
-                            <?php
-                            // فراخوانی هوک اکشن برای نمایش محتوای تب فعلی.
-                            // فایل‌های تب باید به این اکشن هوک کنند تا فیلدهای خود را رندر کنند.
-                            do_action("nader_settings_tab_{$this->current_tab_id}", $this);
-                            ?>
-                        </div>
+                    wp_nonce_field('nader_settings_nonce', 'nader_nonce');
+
+                    foreach ($this->tabs as $tab_id => $tab) {
+                        $active_class = ($tab_id === $this->current_tab_id) ? ' active' : '';
+                        echo '<div class="nader-tab-pane' . $active_class . '" id="tab-' . esc_attr($tab_id) . '">';
+                        do_action("nader_settings_tab_{$tab_id}", $this);
+                        echo '</div>';
+                    }
+                    ?>
                 </div>
             </div>
         </form>

@@ -733,4 +733,50 @@ jQuery(document).ready(function($) {
     initializeNaderSettingsModules(null); // null برای اولیه سازی در کل صفحه
 
 
+
+    // انتخاب عناصر مورد نیاز
+    const $tabLinks = $('.nader-tabs-nav a');
+    const $tabPanes = $('.nader-tab-pane');
+
+    // مدیریت کلیک روی تب‌ها
+    $tabLinks.on('click', function(e) {
+        e.preventDefault();
+        const tabId = $(this).data('tab');
+
+        // حذف کلاس active از همه عناصر
+        $tabLinks.removeClass('active');
+        $tabPanes.removeClass('active');
+
+        // افزودن کلاس active به عناصر مرتبط
+        $(this).addClass('active');
+        $(`#tab-${tabId}`).addClass('active');
+
+        // به روزرسانی URL بدون رفرش
+        history.pushState(null, null, `?page=nader-settings&tab=${tabId}`);
+    });
+
+    // مدیریت تغییرات در تاریخچه مرورگر
+    $(window).on('popstate', function() {
+        const params = new URLSearchParams(window.location.search);
+        const tabId = params.get('tab');
+
+        if (tabId) {
+            const $targetTab = $(`.nader-tabs-nav a[data-tab="${tabId}"]`);
+            if ($targetTab.length) {
+                $tabLinks.removeClass('active');
+                $tabPanes.removeClass('active');
+                $targetTab.addClass('active');
+                $(`#tab-${tabId}`).addClass('active');
+            }
+        }
+    });
+
+    // فعال سازی تب اولیه بر اساس URL
+    const initialTab = new URLSearchParams(window.location.search).get('tab');
+    if (initialTab) {
+        $(`.nader-tabs-nav a[data-tab="${initialTab}"]`).trigger('click');
+    } else {
+        $tabLinks.first().trigger('click');
+    }
+
 }); // پایان document ready
