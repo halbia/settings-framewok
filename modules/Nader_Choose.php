@@ -91,6 +91,9 @@ class Nader_Choose extends Nader_Module {
 
     private function get_initial_selected_items(array $ids, string $type): array {
         $items = [];
+        if (empty($ids)) {
+            return $items;
+        }
         switch ($type) {
             case 'post':
                 $posts = get_posts([
@@ -141,19 +144,28 @@ class Nader_Choose extends Nader_Module {
         $errors = [];
         $query_type = $this->args['query']['type'];
 
+        // اگر فیلد الزامی نیست و مقدار خالی است
+        if (!$this->is_required() && empty($value)) {
+            return $errors;
+        }
+
         // اعتبارسنجی نقش‌ها
         if ($query_type === 'role') {
-            $valid_roles = array_keys(get_editable_roles());
             $submitted = $this->args['multiple'] ? (array)$value : [$value];
+            $submitted = array_filter($submitted); // حذف مقادیر خالی
 
-            foreach ($submitted as $role) {
-                if (!in_array($role, $valid_roles)) {
-                    $errors[] = 'نقش انتخاب شده نامعتبر است.';
-                    break;
+            if (!empty($submitted)) {
+                $valid_roles = array_keys(get_editable_roles());
+                foreach ($submitted as $role) {
+                    if (!in_array($role, $valid_roles)) {
+                        $errors[] = 'نقش انتخاب شده نامعتبر است.';
+                        break;
+                    }
                 }
             }
         }
 
+        // اعتبارسنجی الزامی بودن
         if ($this->is_required() && empty($value)) {
             $errors[] = $this->get_error_message('required', $lang);
         }
@@ -164,18 +176,24 @@ class Nader_Choose extends Nader_Module {
     protected function sanitize_value($value) {
         $query_type = $this->args['query']['type'];
 
-        // پاکسازی ویژه برای نقش‌ها
         if ($query_type === 'role') {
             $valid_roles = array_keys(get_editable_roles());
 
-            if ($this->args['multiple']) {
-                return array_filter((array)$value, fn($role) => in_array($role, $valid_roles));
-            } else {
-                return in_array($value, $valid_roles) ? $value : '';
+            // اگر مقدار خالی است
+            if (empty($value)) {
+                return $this->args['multiple'] ? [] : '';
             }
+
+            if ($this->args['multiple']) {
+                return array_filter(
+                    (array)$value,
+                    fn($role) => in_array($role, $valid_roles)
+                );
+            }
+
+            return in_array($value, $valid_roles) ? $value : '';
         }
 
-        // پاکسازی استاندارد برای سایر انواع
         return parent::sanitize_value($value);
     }
 
