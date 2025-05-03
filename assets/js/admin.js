@@ -736,7 +736,7 @@ jQuery(document).ready(function($) {
 
     // انتخاب عناصر مورد نیاز
     const $tabLinks = $('.nader-tabs-nav a');
-    const $tabPanes = $('.nader-tab-pane');
+    const $tabPanes = $('.nader-tab-panel');
 
     // مدیریت کلیک روی تب‌ها
     $tabLinks.on('click', function(e) {
@@ -780,3 +780,13 @@ jQuery(document).ready(function($) {
     }
 
 }); // پایان document ready
+
+// مدیریت تغییرات تاریخچه
+window.addEventListener('popstate', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabId = urlParams.get('tab');
+    if (tabId) {
+        const tabLink = document.querySelector(`.nader-tabs-nav a[data-tab="${tabId}"]`);
+        if (tabLink) tabLink.click();
+    }
+});

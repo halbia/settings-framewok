@@ -585,11 +585,11 @@ hr {
 }
 
 /* مخفی کردن تب‌های غیرفعال */
-.nader-tab-pane {
+.nader-tab-panel {
   display: none;
 }
 
-.nader-tab-pane.active {
+.nader-tab-panel.active {
   display: block;
 }
 

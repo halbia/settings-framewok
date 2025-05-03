@@ -2,13 +2,11 @@
 if (!defined('ABSPATH'))
     exit;
 
-$nader_settings = Nader_Settings::instance();
-
 // ثبت تب متفرقه
 $nader_settings->register_tab([
     'id'    => 'misc',
     'title' => 'متفرقه',
-    'order' => 20
+    'order' => 100
 ]);
 
 // ثبت پیکربندی ماژول‌ها

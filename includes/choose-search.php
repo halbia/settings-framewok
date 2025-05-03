@@ -1,4 +1,5 @@
 <?php
+defined( 'ABSPATH' ) || exit;
 
 /**
  * هندلر درخواست AJAX برای جستجو در ماژول Choose.
@@ -99,7 +100,28 @@ add_action('wp_ajax_nader_choose_search', function ()
             foreach ($users as $user) {
                 $results[] = ['id'   => $user->ID,
                               'text' => esc_html($user->display_name) . ' (' . esc_html($user->user_login) . ')'
-                ]; // نمایش نمایش نام و نام کاربری
+                ];
+            }
+            break;
+
+        case 'role':
+            // دریافت تمام نقش‌های قابل ویرایش
+            $roles = get_editable_roles();
+            $counter = 0;
+
+            foreach ($roles as $role_id => $role_data) {
+                // جستجو در نام نقش (ترجمه شده)
+                $role_name = translate_user_role($role_data['name']);
+                if (stripos($role_name, $search_term) === false) continue;
+
+                // اضافه کردن به نتایج
+                $results[] = [
+                    'id' => $role_id,
+                    'text' => esc_html($role_name)
+                ];
+
+                // محدودیت تعداد نتایج
+                if (++$counter >= $limit) break;
             }
             break;
 

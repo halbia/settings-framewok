@@ -341,7 +341,7 @@ final class Nader_Settings{
 
                     foreach ($this->tabs as $tab_id => $tab) {
                         $active_class = ($tab_id === $this->current_tab_id) ? ' active' : '';
-                        echo '<div class="nader-tab-pane' . $active_class . '" id="tab-' . esc_attr($tab_id) . '">';
+                        echo '<div class="nader-tab-panel' . $active_class . '" id="tab-' . esc_attr($tab_id) . '">';
                         do_action("nader_settings_tab_{$tab_id}", $this);
                         echo '</div>';
                     }

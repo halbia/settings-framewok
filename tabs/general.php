@@ -7,20 +7,17 @@
 if (!defined('ABSPATH'))
     exit; // اگر مستقیماً فراخوانی شده، خارج شو.
 
-// اطمینان از وجود کلاس اصلی Nader_Settings
 if (!class_exists('Nader_Settings')) {
     error_log('Nader Settings: Nader_Settings class not found when loading general tab.');
     return;
 }
 
-// دریافت نمونه Singleton
 $nader_settings = Nader_Settings::instance();
 
-// 1. ثبت تب عمومی در چارچوب تنظیمات
 $nader_settings->register_tab([
-    'id'    => 'general', // شناسه منحصر به فرد تب
-    'title' => 'تنظیمات عمومی (نمونه‌ها)', // عنوان تب نمایش داده شده در UI
-    'order' => 5 // ترتیب نمایش تب (اعداد کمتر جلوتر نمایش داده می‌شوند)
+    'id'    => 'general',
+    'title' => 'تنظیمات عمومی (نمونه‌ها)',
+    'order' => 1
 ]);
 
 
@@ -245,6 +242,15 @@ $nader_settings->register_module_config([
     'default'     => 'layout_right_simple', // مقدار پیش‌فرض (value)
 ]);
 
+$nader_settings->register_module_config([
+    'name'   => 'team',
+    'type' => 'repeater',
+    'fields' => [
+        ['name' => 'name', 'type' => 'text', 'title' => 'نام'],
+        ['name' => 'photo', 'type' => 'image', 'title' => 'عکس'],
+        ['name' => 'color', 'type' => 'color', 'title' => 'رنگ']
+    ]
+]);
 
 
 // 2. تعریف محتوای تب عمومی برای رندر کردن
@@ -478,5 +484,15 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
     $image_select_url_simple_field->render();
     echo '<hr>'; // جداکننده
 
+    // رندر فیلد
+    $repeater = new Nader_Repeater([
+        'name' => 'team',
+        'fields' => [
+            ['name' => 'name', 'type' => 'text', 'title' => 'نام'],
+            ['name' => 'photo', 'type' => 'image', 'title' => 'عکس'],
+            ['name' => 'color', 'type' => 'color', 'title' => 'رنگ']
+        ]
+    ]);
+    $repeater->render();
 
 }, 10, 1); // پایان add_action برای تب عمومی
