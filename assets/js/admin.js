@@ -713,7 +713,6 @@ jQuery(document).ready(function($) {
     function initializeNaderSettingsModules($container) {
 
         if (!$container || $container.length === 0) {
-            // اگر کانتینر null بود، در کل صفحه جستجو کن. از $container به عنوان یک شیء jQuery استفاده می‌کنیم.
             $container = ($container instanceof $) ? $container : $('.nader-settings-wrap');
         }
 
@@ -731,9 +730,6 @@ jQuery(document).ready(function($) {
 
     }
 
-
-    // --- فراخوانی اولیه سازی هنگام بارگذاری صفحه ---
-    // اطمینان از اینکه jQuery و DOM آماده هستند.
     initializeNaderSettingsModules(null); // null برای اولیه سازی در کل صفحه
 
 

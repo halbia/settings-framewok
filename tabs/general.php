@@ -424,6 +424,17 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
             'post_status' => ['publish', 'private'],
         ],
         'placeholder' => 'نوشته‌ای را جستجو کنید...',
+
+        'dependencies' => [
+            'relation' => 'AND',
+            'rules' => [
+                [
+                    'field' => 'demo_toggle',
+                    'operator' => '==',
+                    'value' => '1'
+                ]
+            ]
+        ]
     ]);
     $choose_post_field->render();
     echo '<hr>'; // جداکننده

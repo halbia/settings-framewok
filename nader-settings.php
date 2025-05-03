@@ -278,11 +278,8 @@ final class Nader_Settings{
             ]
         );
 
-        // --- بارگذاری دارایی‌های مخصوص ماژول ---
-        // این اکشن به ماژول‌ها اجازه می‌دهد دارایی‌های خاص خود را صف‌بندی کنند
-        // (اگرچه اکثر دارایی‌های عمومی در بالا صف‌بندی شده‌اند).
-        // این اکشن را در کلاس پایه Nader_Module (اگر نیاز به صف‌بندی عمومی برای همه ماژول‌ها باشد)
-        // یا در فایل هر ماژول خاص (اگر دارایی‌ها مختص آن ماژول باشد) هوک کنید.
+        wp_enqueue_script('nader-dependency', NAD_SETTINGS_URL . 'assets/js/nader-dependency.js', [], NAD_SETTINGS_VERSION, true);
+
         do_action('nader_settings_enqueue_module_assets', $this->current_tab_id, $this);
     }
 

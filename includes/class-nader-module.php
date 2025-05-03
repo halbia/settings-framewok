@@ -31,13 +31,12 @@ abstract class Nader_Module {
             'class'       => '', // اختیاری: کلاس‌های CSS اضافی برای عنصر ورودی (input)
             'wrapper_class' => '', // اختیاری: کلاس‌های CSS اضافی برای wrapper فیلد
             'attributes'  => [], // اختیاری: آرایه‌ای از ویژگی‌های HTML اضافی برای عنصر ورودی
-            // Add any other common arguments here
+            'dependencies' => []
         ]);
 
         // اطمینان از تنظیم بودن نام و عنوان
         if (empty($this->args['name'])) {
             error_log('Nader Settings: ماژول بدون نام نمونه‌سازی شده است.');
-            // در محیط توسعه می‌توانید یک خطای PHP ایجاد کنید: trigger_error('ماژول بدون نام نمونه‌سازی شده است', E_USER_WARNING);
         }
         if (empty($this->args['title'])) {
             error_log('Nader Settings: ماژول "' . $this->args['name'] . '" بدون عنوان نمونه‌سازی شده است.');
@@ -140,11 +139,12 @@ abstract class Nader_Module {
             $classes[] = 'nader-multilang-wrapper';
         }
 
-        printf(
-            '<div class="%s" data-field-name="%s">',
-            esc_attr(implode(' ', $classes)),
-            esc_attr($name) // نام فیلد (نام اصلی برای گروه چندزبانه)
-        );
+        $dependency_data = '';
+        if (!empty($this->args['dependencies'])) {
+            $dependency_data = 'data-dependencies="' . esc_attr(json_encode($this->args['dependencies'])) . '"';
+        }
+
+        echo '<div class="' . esc_attr(implode(' ', $classes)) . '" ' . $dependency_data . '>';
     }
 
     /**
