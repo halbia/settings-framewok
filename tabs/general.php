@@ -21,14 +21,29 @@ $nader_settings->register_module_config([
     'name'    => 'loading_status',
     'type'    => 'toggle',
     'title'   => 'وضعیت لودینگ',
-    'default' => 0
+    'default' => 1
 ]);
 
 $nader_settings->register_module_config([
     'name'         => 'loading_type',
     'type'         => 'select',
     'title'        => 'نوع لودینگ',
-    'options'      => array_merge(['logo' => 'لوگو'], array_combine(range(1,10), array_map(fn($n) => "نوع $n", range(1,10)))),
+    'default' => 'logo',
+    'options' => array_merge(
+        ['logo' => 'لوگو'],
+        [
+            'type-1'  => 'نوع 1',
+            'type-2'  => 'نوع 2',
+            'type-3'  => 'نوع 3',
+            'type-4'  => 'نوع 4',
+            'type-5'  => 'نوع 5',
+            'type-6'  => 'نوع 6',
+            'type-7'  => 'نوع 7',
+            'type-8'  => 'نوع 8',
+            'type-9'  => 'نوع 9',
+            'type-10' => 'نوع 10',
+        ]
+    ),
     'dependencies' => [
         'relation' => 'AND',
         'rules' => [['field' => 'loading_status', 'operator' => '==', 'value' => '1']]
@@ -39,6 +54,7 @@ $nader_settings->register_module_config([
     'name'         => 'loading_logo',
     'type'         => 'image',
     'title'        => 'لوگو لودینگ',
+    'required' => true,
     'dependencies' => [
         'relation' => 'AND',
         'rules' => [
@@ -66,7 +82,7 @@ $nader_settings->register_module_config([
     'name'    => 'mouse_follower_status',
     'type'    => 'toggle',
     'title'   => 'وضعیت دنبال کننده موس',
-    'default' => 0
+    'default' => 1
 ]);
 
 $nader_settings->register_module_config([
@@ -79,62 +95,12 @@ $nader_settings->register_module_config([
     ]
 ]);
 
-// بخش دکمه تماس
 $nader_settings->register_module_config([
-    'name'    => 'contact_button_status',
+    'name'    => 'breadcrumb_status',
     'type'    => 'toggle',
-    'title'   => 'وضعیت دکمه تماس',
-    'default' => 0
-]);
-
-$nader_settings->register_module_config([
-    'name'         => 'contact_button_title',
-    'type'         => 'text',
-    'title'        => 'عنوان دکمه تماس',
-    'dependencies' => [
-        'relation' => 'AND',
-        'rules' => [['field' => 'contact_button_status', 'operator' => '==', 'value' => '1']]
-    ]
-]);
-
-$nader_settings->register_module_config([
-    'name'         => 'contact_button_url',
-    'type'         => 'url',
-    'title'        => 'لینک دکمه تماس',
-    'dependencies' => [
-        'relation' => 'AND',
-        'rules' => [['field' => 'contact_button_status', 'operator' => '==', 'value' => '1']]
-    ],
-    'attributes'   => ['pattern' => 'https?://.+']
-]);
-
-// بخش شبکه‌های اجتماعی
-$social_platforms = [
-    'facebook' => 'فیسبوک', 'twitter' => 'توییتر', 'linkedin' => 'لینکداین',
-    'instagram' => 'اینستاگرام', 'telegram' => 'تلگرام', 'whatsapp' => 'واتساپ',
-    'dribbble' => 'دریبل', 'behance' => 'بیهنس', 'github' => 'گیت هاب',
-    'gitlab' => 'گیت لب', 'youtube' => 'یوتیوب', 'aparat' => 'آپارات',
-    'eitaa' => 'ایتا', 'rubika' => 'روبیکا', 'bale' => 'بله',
-    'igap' => 'آیگپ', 'soroushplus' => 'سروش پلاس', 'email' => 'ایمیل'
-];
-
-$nader_settings->register_module_config([
-    'name'    => 'social_media_status',
-    'type'    => 'toggle',
-    'title' => 'وضعیت شبکه‌های اجتماعی',
+    'title'   => 'وضعیت مسیر کاربر',
     'default' => 1
 ]);
-foreach ($social_platforms as $key => $title) {
-    $nader_settings->register_module_config([
-        'name'         => "social_{$key}",
-        'type'         => 'text',
-        'title'        => $title,
-        'dependencies' => [
-            'relation' => 'AND',
-            'rules' => [['field' => 'social_media_status', 'operator' => '==', 'value' => '1']]
-        ]
-    ]);
-}
 
 // بخش کلمات کلیدی
 $nader_settings->register_module_config([
@@ -152,24 +118,9 @@ $nader_settings->register_module_config([
 ]);
 
 // ------------------ رندر تب ------------------
-add_action('nader_settings_tab_general', function($nader_settings_instance) {
-    // بررسی وجود کلاس‌های ضروری
-    $required_classes = ['Nader_Toggle','Nader_Select','Nader_Image','Nader_Text','Nader_Color','Nader_Repeater'];
-    foreach ($required_classes as $class) {
-        if (!class_exists($class)) {
-            echo "<div class='nader-error'>خطا: کلاس {$class} یافت نشد!</div>";
-            return;
-        }
-    }
+add_action('nader_settings_tab_general', function() {
     $nader_settings = Nader_Settings::instance();
-    $social_platforms = [
-        'facebook' => 'فیسبوک', 'twitter' => 'توییتر', 'linkedin' => 'لینکداین',
-        'instagram' => 'اینستاگرام', 'telegram' => 'تلگرام', 'whatsapp' => 'واتساپ',
-        'dribbble' => 'دریبل', 'behance' => 'بیهنس', 'github' => 'گیت هاب',
-        'gitlab' => 'گیت لب', 'youtube' => 'یوتیوب', 'aparat' => 'آپارات',
-        'eitaa' => 'ایتا', 'rubika' => 'روبیکا', 'bale' => 'بله',
-        'igap' => 'آیگپ', 'soroushplus' => 'سروش پلاس', 'email' => 'ایمیل'
-    ];
+
 
     ?>
     <div class="nader-fields-group">
@@ -190,6 +141,7 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
         </div>
     </div>
 
+    <hr/>
 
     <div class="nader-fields-group">
         <h4>دنبال کننده موس</h4>
@@ -203,40 +155,9 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
         </div>
     </div>
 
-    <div class="nader-fields-group">
-        <h4>دکمه تماس در هدر غیر المنتوری</h4>
-        <div class="row">
-            <div class="third">
-                <?php (new Nader_Toggle($nader_settings->get_registered_module_config('contact_button_status')))->render(); ?>
-            </div>
-            <div class="third">
-                <?php (new Nader_Text($nader_settings->get_registered_module_config('contact_button_title')))->render(); ?>
-            </div>
-            <div class="third">
-                <?php (new Nader_Text($nader_settings->get_registered_module_config('contact_button_url')))->render(); ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="nader-fields-group">
-        <h4>شبکه های اجتماعی در منوی موبایل غیر المنتوری</h4>
-        <div class="row">
-            <div class="full">
-                <?php (new Nader_Toggle($nader_settings->get_registered_module_config('social_media_status')))->render(); ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <?php foreach ($social_platforms as $key => $title) { ?>
-            <div class="quarter">
-                <?php (new Nader_Text($nader_settings->get_registered_module_config("social_{$key}")))->render(); ?>
-            </div>
-            <?php } ?>
-        </div>
-    </div>
-
-    <div style="margin-top: 28px">
-    </div>
+        <hr/>
+    <?php (new Nader_Toggle($nader_settings->get_registered_module_config('breadcrumb_status')))->render(); ?>
+        <hr/>
     <?php
     (new Nader_Repeater($nader_settings->get_registered_module_config('search_keywords')))->render();
 

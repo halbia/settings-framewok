@@ -16,6 +16,7 @@ class Nader_Repeater extends Nader_Module {
             'max_items'   => 0,
             'collapsible' => true,
             'fields'      => [],
+            'button_title' => 'افزودن آیتم جدید'
         ];
 
         $args = wp_parse_args($args, $defaults);
@@ -90,7 +91,7 @@ class Nader_Repeater extends Nader_Module {
                 <?php endforeach; ?>
             </div>
 
-            <button type="button" class="add-repeater-item">Add Item</button>
+            <button type="button" class="add-repeater-item button button-primary"><?php echo $this->args['button_title']; ?></button>
         </div>
         <?php
     }

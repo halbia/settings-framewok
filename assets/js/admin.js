@@ -485,6 +485,7 @@ jQuery(document).ready(function($) {
             const $addButton = $repeater.find('.add-repeater-item');
             const minItems = parseInt($repeater.data('min-items')) || 0;
             const maxItems = parseInt($repeater.data('max-items')) || 0;
+            const itemLabel = $repeater.data('title') || 'آیتم';
 
             // افزودن آیتم جدید
             $addButton.off('click').on('click', function() {
@@ -522,30 +523,31 @@ jQuery(document).ready(function($) {
             // ایجاد آیتم جدید
             function createRepeaterItem(baseName, index, fields) {
                 const $item = $(`
-                <div class="repeater-item" data-index="${index}">
-                    <div class="item-header">
-                        <span class="item-title">آیتم ${index + 1}</span>
-                        <div class="item-actions">
-                            <button type="button" class="move-up">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 22.0003L11.0002 22.0004L11.0002 5.82845L7.05044 9.77817L5.63623 8.36396L12.0002 2L18.3642 8.36396L16.9499 9.77817L13.0002 5.8284L13.0001 22.0003Z"></path></svg>
-                            </button>
-                            <button type="button" class="move-down">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 1.99974L11.0002 1.9996L11.0002 18.1715L7.05044 14.2218L5.63623 15.636L12.0002 22L18.3642 15.636L16.9499 14.2218L13.0002 18.1716L13.0001 1.99974Z"></path></svg>
-                            </button>
-                            <button type="button" class="toggle-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.9995 13.4995 16.9492 18.4493 15.535 19.8635 12.9995 17.3279 12.9995 22.9995H10.9995L10.9995 17.3279 8.46643 19.861 7.05222 18.4468 11.9995 13.4995ZM10.9995.999512 10.9995 6.67035 8.46448 4.13535 7.05026 5.54956 12 10.4995 16.9497 5.54977 15.5355 4.13555 12.9995 6.67157V.999512L10.9995.999512Z"></path></svg>
-                            </button>
-                            <button type="button" class="remove-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"></path>
-                                </svg>
-                            </button>
-                        </div>
+            <div class="repeater-item" data-index="${index}">
+                <div class="item-header">
+                    <span class="item-title">${itemLabel} ${index + 1}</span>
+                    <div class="item-actions">
+                        <button type="button" class="move-up">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 22.0003L11.0002 22.0004L11.0002 5.82845L7.05044 9.77817L5.63623 8.36396L12.0002 2L18.3642 8.36396L16.9499 9.77817L13.0002 5.8284L13.0001 22.0003Z"></path></svg>
+                        </button>
+                        <button type="button" class="move-down">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 1.99974L11.0002 1.9996L11.0002 18.1715L7.05044 14.2218L5.63623 15.636L12.0002 22L18.3642 15.636L16.9499 14.2218L13.0002 18.1716L13.0001 1.99974Z"></path></svg>
+                        </button>
+                        <button type="button" class="toggle-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.9995 0.499512L16.9492 5.44926L15.535 6.86347L12.9995 4.32794V9.99951H10.9995L10.9995 4.32794L8.46643 6.86099L7.05222 5.44678L11.9995 0.499512ZM10.9995 13.9995L10.9995 19.6704L8.46448 17.1353L7.05026 18.5496L12 23.4995L16.9497 18.5498L15.5355 17.1356L12.9995 19.6716V13.9995H10.9995Z"></path></svg>
+                        </button>
+                        <button type="button" class="remove-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"></path>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="item-content"></div>
                 </div>
+                <div class="item-content"></div>
+            </div>
             `);
 
+                // ایجاد فیلدها
                 fields.forEach(field => {
                     const $field = createField(baseName, index, field);
                     $item.find('.item-content').append($field);
@@ -570,11 +572,11 @@ jQuery(document).ready(function($) {
 
                     case 'checkbox':
                         $field = $(`
-                        <label class="nader-checkbox-wrapper">
-                            <input type="checkbox" name="${fieldName}" value="1" class="nader-checkbox-input">
-                            <span class="checkmark"></span>
-                            ${fieldConfig.label || ''}
-                        </label>
+                    <label class="nader-checkbox-wrapper">
+                        <input type="checkbox" name="${fieldName}" value="1" class="nader-checkbox-input">
+                        <span class="checkmark"></span>
+                        ${fieldConfig.label || ''}
+                    </label>
                     `);
                         break;
 
@@ -670,20 +672,20 @@ jQuery(document).ready(function($) {
                 }
 
                 return $(`
-                <div class="nader-field-wrapper" data-type="${fieldConfig.type}">
-                    <label class="nader-field-label">${fieldConfig.title}</label>
-                    <div class="nader-field-content">${$field.prop('outerHTML')}</div>
-                    <ul class="nader-errors"></ul>
-                </div>
-            `);
+                        <div class="nader-field-wrapper" data-type="${fieldConfig.type}">
+                            <label class="nader-field-label">${fieldConfig.title}</label>
+                            <div class="nader-field-content">${$field.prop('outerHTML')}</div>
+                            <ul class="nader-errors"></ul>
+                        </div>
+                    `);
             }
 
-            // به‌روزرسانی شماره آیتم‌ها
+            // بازنشانی ایندکس‌ها
             function reindexItems() {
                 $itemsContainer.children().each(function(index) {
                     $(this)
                         .attr('data-index', index)
-                        .find('.item-title').text(`آیتم ${index + 1}`);
+                        .find('.item-title').text(`${itemLabel} ${index + 1}`);
                 });
             }
 

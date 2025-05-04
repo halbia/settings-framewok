@@ -21,7 +21,7 @@ abstract class Nader_Module {
         // تعریف آرگومان‌های پایه و ادغام با آرگومان‌های ارائه شده
         $this->args = wp_parse_args($args, [
             'name'        => '', // الزامی: نام منحصر به فرد برای فیلد تنظیمات (مثال: 'site_title')
-            'title'       => '', // الزامی: عنوانی که در رابط کاربری نمایش داده می‌شود
+            'title'       => '', // اختیاری: عنوانی که در رابط کاربری نمایش داده می‌شود
             'description' => '', // اختیاری: توضیحات یا متن راهنما
             'required'    => false, // اختیاری: آیا این فیلد الزامی است؟
             'default'     => null, // اختیاری: مقدار پیش‌فرض اگر تنظیماتی ذخیره نشده باشد. استفاده از null امکان تشخیص از رشته خالی ذخیره شده را می‌دهد.
@@ -39,7 +39,7 @@ abstract class Nader_Module {
             error_log('Nader Settings: ماژول بدون نام نمونه‌سازی شده است.');
         }
         if (empty($this->args['title'])) {
-            error_log('Nader Settings: ماژول "' . $this->args['name'] . '" بدون عنوان نمونه‌سازی شده است.');
+//            error_log('Nader Settings: ماژول "' . $this->args['name'] . '" بدون عنوان نمونه‌سازی شده است.');
         }
     }
 
@@ -73,7 +73,6 @@ abstract class Nader_Module {
         $this->render_field_label(); // رندر عنوان فیلد
         $this->render_description(); // رندر توضیحات
         $this->render_field($field_name, $current_value); // متد انتزاعی که توسط کلاس‌های فرزند پیاده‌سازی می‌شود
-        // اصلاحیه: ارسال نام فیلد به تابع render_errors()
         $this->render_errors($field_name); // رندر Placeholder برای خطاها (توسط JS پر می‌شود)
         $this->render_field_wrapper_end(); // پایان wrapper فیلد
     }
@@ -97,19 +96,13 @@ abstract class Nader_Module {
         foreach ($languages as $lang) {
             $field_name = $this->get_field_name($lang); // دریافت نام کامل فیلد (نام اصلی__کد_زبان)
             $current_value = $this->get_field_value($lang); // دریافت مقدار ذخیره شده برای این زبان
-
-            // رندر wrapper/عناصر برای فیلد هر زبان در داخل کانتینر چندزبانه
             $this->render_language_field_start($lang, $field_name);
             $this->render_language_label($lang); // عنوان مخصوص زبان
             $this->render_field($field_name, $current_value); // متد انتزاعی برای عنصر ورودی واقعی
-            // توضیحات و خطاها می‌توانند بسته به نیاز UI مشترک یا مخصوص هر زبان باشند
-            // $this->render_description(); // توضیحات مشترک
             $this->render_errors($field_name); // رندر Placeholder برای خطاها (با نام کامل فیلد)
             $this->render_language_field_end();
         }
         echo '</div>'; // پایان کانتینر فیلدهای زبان
-
-        // رندر توضیحات مشترک پس از تمام فیلدها
 
         $this->render_field_wrapper_end(); // پایان wrapper اصلی برای گروه چندزبانه
     }
@@ -223,7 +216,7 @@ abstract class Nader_Module {
         if (!empty($this->args['description'])) {
             printf(
                 '<p class="description">%s</p>',
-                esc_html($this->args['description'])
+                $this->args['description']
             );
         }
     }
