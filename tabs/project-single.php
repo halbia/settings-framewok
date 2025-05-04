@@ -35,17 +35,6 @@ $nader_settings->register_module_config([
 ]);
 
 $nader_settings->register_module_config([
-    'name'     => 'project_pages',
-    'type'     => 'choose',
-    'title'    => 'برگه پروژه‌ها',
-    'multiple' => false,
-    'query'    => [
-        'type'      => 'post',
-        'post_type' => 'page'
-    ],
-]);
-
-$nader_settings->register_module_config([
     'name'  => 'content_tab_title',
     'type'  => 'text',
     'title' => 'عنوان تب محتوا',
@@ -64,7 +53,7 @@ $nader_settings->register_module_config([
     'multiple' => false,
     'query'    => [
         'type'      => 'post',
-        'post_type' => 'page'
+        'post_type' => 'elementor_library'
     ],
 ]);
 
@@ -136,19 +125,6 @@ add_action('nader_settings_tab_project_continue', function($nader_settings_insta
     ]))->render();
     echo '<hr>';
 
-    // انتخاب برگه پروژه‌ها
-    (new Nader_Choose([
-        'name'        => 'project_pages',
-        'title'       => 'برگه‌ لیست پروژه ها',
-        'multiple'    => false,
-        'query'       => [
-            'type'      => 'post',
-            'post_type' => 'page'
-        ],
-        'placeholder' => 'جستجوی برگه...'
-    ]))->render();
-    echo '<hr>';
-
     // عنوان تب محتوا
     (new Nader_Text([
         'name'        => 'content_tab_title',
@@ -175,7 +151,7 @@ add_action('nader_settings_tab_project_continue', function($nader_settings_insta
         'multiple'    => false,
         'query'       => [
             'type'      => 'post',
-            'post_type' => 'page'
+            'post_type' => 'elementor_library'
         ],
         'placeholder' => 'جستجوی فرم...'
     ]))->render();
