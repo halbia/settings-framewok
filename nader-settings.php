@@ -373,8 +373,12 @@ final class Nader_Settings{
 
         foreach ($this->registered_module_configs as $module_name => $module_config) {
             try {
-                $module_type = $module_config['type'];
+                // بررسی وابستگی‌های ماژول
+                if (!$this->are_dependencies_met($module_config, $submitted_data)) {
+                    continue; // اگر وابستگی برقرار نباشد، ماژول پردازش نشود
+                }
 
+                $module_type = $module_config['type'];
                 // تشخیص کلاس ماژول
                 $text_types = ['text', 'url', 'tel', 'number', 'email'];
                 if(in_array($module_type, $text_types)) {
@@ -502,6 +506,65 @@ final class Nader_Settings{
         wp_send_json_success('تنظیمات با موفقیت بازنشانی شد!');
     }
 
+    private function are_dependencies_met(array $module_config, array $submitted_data): bool {
+        $dependencies = $module_config['dependencies'] ?? [];
+        if (empty($dependencies)) {
+            return true;
+        }
+
+        $relation = $dependencies['relation'] ?? 'AND';
+        $rules = $dependencies['rules'] ?? [];
+
+        $results = [];
+        foreach ($rules as $rule) {
+            $field = $rule['field'];
+            $operator = $rule['operator'];
+            $value = $rule['value'];
+
+            $submitted_value = $submitted_data[$field] ?? null;
+
+            // تبدیل نوع داده بر اساس مقدار rule
+            if (is_int($value)) {
+                $submitted_value = (int)$submitted_value;
+            } elseif (is_bool($value)) {
+                $submitted_value = filter_var($submitted_value, FILTER_VALIDATE_BOOLEAN);
+            } else {
+                $submitted_value = (string)$submitted_value;
+            }
+
+            // بررسی عملگر
+            switch ($operator) {
+                case '==':
+                    $result = ($submitted_value == $value);
+                    break;
+                case '!=':
+                    $result = ($submitted_value != $value);
+                    break;
+                case '>':
+                    $result = ($submitted_value > $value);
+                    break;
+                case '>=':
+                    $result = ($submitted_value >= $value);
+                    break;
+                case '<':
+                    $result = ($submitted_value < $value);
+                    break;
+                case '<=':
+                    $result = ($submitted_value <= $value);
+                    break;
+                default:
+                    $result = false;
+            }
+
+            $results[] = $result;
+        }
+
+        if ($relation === 'AND') {
+            return !in_array(false, $results, true);
+        } else {
+            return in_array(true, $results, true);
+        }
+    }
 
     /**
      * دریافت مقدار یک تنظیم خاص.

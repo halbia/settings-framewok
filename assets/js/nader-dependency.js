@@ -52,6 +52,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     results.every(Boolean) :
                     results.some(Boolean);
 
+                // --- تغییرات جدید: مدیریت ویژگی required ---
+                const inputs = wrapper.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (showElement) {
+                        // اگر نمایش داده می‌شود، required اصلی را بازگردان
+                        if (input.dataset.required) {
+                            input.required = true;
+                            delete input.dataset.required;
+                        }
+                    } else {
+                        // اگر مخفی است، required را غیرفعال و ذخیره کنید
+                        if (input.required) {
+                            input.dataset.required = 'true'; // ذخیره وضعیت اصلی
+                            input.required = false;
+                        }
+                    }
+                });
+
                 wrapper.style.display = showElement ? 'block' : 'none';
 
             } catch (error) {

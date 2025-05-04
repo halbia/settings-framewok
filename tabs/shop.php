@@ -123,6 +123,7 @@ $nader_settings->register_module_config([
     'name'         => 'empty_price_button_url',
     'type'         => 'url',
     'title'        => 'لینک دکمه',
+    'required' => true,
     'dependencies' => [
         'relation' => 'AND',
         'rules'    => [
@@ -266,6 +267,7 @@ add_action('nader_settings_tab_shop', function($nader_settings_instance) {
         'name'         => 'empty_price_button_url',
         'title'        => 'لینک دکمه',
         'type'         => 'url',
+        'required' => true,
         'dependencies' => [
             'relation' => 'AND',
             'rules'    => [
