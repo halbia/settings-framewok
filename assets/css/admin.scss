@@ -753,3 +753,18 @@ hr {
   max-width: 100%;
   border-color: #eee;
 }
+
+.nader-settings-notice {
+  display:       flex;
+  align-items:   center;
+  margin: 24px 0;
+  padding:       12px;
+  background:    white;
+  box-shadow:    0 2px 8px 2px #ff830020;
+  border-radius: 4px;
+  border-right:  2px solid #ff8300;
+  border-left:  2px solid #ff8300;
+  b {
+	margin-right: 4px;
+  }
+}

@@ -118,10 +118,7 @@ $nader_settings->register_module_config([
 ]);
 
 // ------------------ رندر تب ------------------
-add_action('nader_settings_tab_general', function() {
-    $nader_settings = Nader_Settings::instance();
-
-
+add_action('nader_settings_tab_general', function($nader_settings) {
     ?>
     <div class="nader-fields-group">
         <h4>لودینگ</h4>

@@ -84,11 +84,10 @@ $nader_settings->register_module_config([
     'name'        => 'copyright_text',
     'type'        => 'textarea',
     'title'       => 'متن کپی رایت',
-    'description' => 'این متن فقط در فوتر ساده غیر المنتوری نمایش داده خواهد شد.<br /> برای فوترهایی که با المنتور ساخته شده اند، لطفا فوتر را باالمنتور باز کرده و تغییر دهید!'
 ]);
 
-add_action('nader_settings_tab_header_footer_none_elementor', function() {
-    $nader_settings = Nader_Settings::instance();
+add_action('nader_settings_tab_header_footer_none_elementor', function($nader_settings) {
+
     $social_platforms = [
         'facebook'    => 'فیسبوک',
         'twitter'     => 'توییتر',
@@ -149,6 +148,8 @@ add_action('nader_settings_tab_header_footer_none_elementor', function() {
     <hr/>
 
     <?php (new Nader_Textarea($nader_settings->get_registered_module_config("copyright_text")))->render(); ?>
-
+    <p class="nader-settings-notice" style="margin-top: 8px;">
+        این متن فقط در فوتر ساده غیر المنتوری نمایش داده خواهد شد.<br /> برای فوترهایی که با المنتور ساخته شده اند، لطفا فوتر را با المنتور باز کرده و تغییر دهید!
+    </p>
     <?php
 });

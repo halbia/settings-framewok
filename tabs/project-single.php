@@ -12,75 +12,75 @@ $nader_settings = Nader_Settings::instance();
 $nader_settings->register_tab([
     'id'    => 'project_continue',
     'title' => 'ادامه مطلب پروژه‌ها',
-    'order' => 8
+    'order' => 15
 ]);
 
-// ثبت ماژول‌ها
-$nader_settings->register_module_config([
-    'name'  => 'project_author_button',
-    'type'  => 'toggle',
-    'title' => 'نمایش نویسنده پروژه',
-]);
+// ثبت ماژول‌های Toggle با حلقه
+foreach ([
+             'project_author_button'   => 'نویسنده پروژه',
+             'project_views_button'    => 'بازدید پروژه',
+             'project_comments_button' => 'نظرات پروژه'
+         ] as $id => $title) {
+    $nader_settings->register_module_config([
+        'name'      => $id,
+        'type'      => 'toggle',
+        'title'     => 'نمایش ' . $title,
+        'default'   => 1,
+        'label_on'  => 'فعال',
+        'label_off' => 'غیرفعال'
+    ]);
+}
 
-$nader_settings->register_module_config([
-    'name'  => 'project_views_button',
-    'type'  => 'toggle',
-    'title' => 'نمایش بازدید پروژه',
-]);
+// ثبت ماژول‌های متنی
+foreach ([
+             'content_tab_title'    => ['عنوان تب محتوا', 'جزئیات پروژه'],
+             'order_form_tab_title' => ['عنوان تب فرم سفارش', 'سفارش پروژه']
+         ] as $id => [$title, $default]) {
+    $nader_settings->register_module_config([
+        'name'        => $id,
+        'type'        => 'text',
+        'title'       => $title,
+        'placeholder' => 'عنوان دلخواه را وارد کنید',
+        'default'     => $default
+    ]);
+}
 
+// ثبت ماژول‌های خاص
 $nader_settings->register_module_config([
-    'name'  => 'project_comments_button',
-    'type'  => 'toggle',
-    'title' => 'نمایش نظرات پروژه',
-]);
-
-$nader_settings->register_module_config([
-    'name'  => 'content_tab_title',
-    'type'  => 'text',
-    'title' => 'عنوان تب محتوا',
-]);
-
-$nader_settings->register_module_config([
-    'name'  => 'order_form_tab_title',
-    'type'  => 'text',
-    'title' => 'عنوان تب فرم سفارش',
-]);
-
-$nader_settings->register_module_config([
-    'name'     => 'project_order_form',
-    'type'     => 'choose',
-    'title'    => 'فرم سفارش پروژه',
-    'multiple' => false,
-    'query'    => [
+    'name'        => 'project_order_form',
+    'type'        => 'choose',
+    'title'       => 'فرم سفارش پروژه',
+    'description' => 'صفحه مربوط به فرم درخواست پروژه',
+    'multiple'    => false,
+    'query'       => [
         'type'      => 'post',
         'post_type' => 'elementor_library'
     ],
+    'placeholder' => 'جستجوی فرم...'
 ]);
 
 $nader_settings->register_module_config([
-    'name'   => 'project_custom_fields',
-    'type'   => 'repeater',
-    'title'  => 'زمینه های دلخواه پروژه',
-    'fields' => [
+    'name'         => 'project_custom_fields',
+    'type'         => 'repeater',
+    'title'        => 'زمینه های دلخواه پروژه',
+    'item_label'   => 'زمینه دلخواه',
+    'button_title' => 'افزودن زمینه دلخواه',
+    'description'  => 'زمینه های دلخواه پروژه ها را اینجا مدیریت کنید.',
+    'fields'       => [
         [
             'name'     => 'title',
             'type'     => 'text',
-            'title'    => 'عنوان آیکون',
+            'description' => 'text',
+            'title'       => 'عنوان',
             'required' => true
         ],
         [
             'name'        => 'key',
             'type'        => 'text',
-            'required'    => true,
             'title'       => 'کلید شناسایی',
             'pattern'     => '^[a-z0-9_]+$',
-            'description' => 'فقط حروف کوچک، اعداد و زیرخط مجاز است'
-        ],
-        [
-            'name'     => 'label',
-            'type'     => 'text',
-            'required' => true,
-            'title'    => 'برچسب نمایشی'
+            'required'    => true,
+            'description' => 'فقط حروف کوچک، اعداد و زیرخط مجاز است - اطلاعات با استفاده از این کلید در دیتابیس ذخیره میشوند'
         ],
         [
             'name'        => 'icon_code',
@@ -93,104 +93,47 @@ $nader_settings->register_module_config([
     ]
 ]);
 
-
 // رندر محتوای تب
 add_action('nader_settings_tab_project_continue', function($nader_settings_instance) {
-    // بررسی وجود کلاس‌های ماژول
-    if (!class_exists('Nader_Toggle') || !class_exists('Nader_Choose') || !class_exists('Nader_Text')) {
-        echo '<p>خطا در بارگذاری ماژول‌های ضروری</p>';
-        return;
+
+    (new Nader_Repeater(
+        $nader_settings_instance->get_registered_module_config('project_custom_fields')
+    ))->render();
+
+    ?>
+
+    <p class="nader-settings-notice">
+        تنظیمات زیر برای ادامه مطلب در حالت غیر المنتوری است! در غیر اینصورت باید با خود المنتور تغییر دهید. راهنمایی بیشتر در منوی -> <b>پیشخوان قالب نادر</b>
+    </p>
+
+    <?php
+
+    // رندر ماژول‌های Toggle
+    foreach ([
+                 'project_author_button',
+                 'project_views_button',
+                 'project_comments_button'
+             ] as $module_id) {
+        (new Nader_Toggle(
+            $nader_settings_instance->get_registered_module_config($module_id)
+        ))->render();
+        echo '<hr>';
     }
 
-    (new Nader_Toggle([
-        'name'      => 'project_author_button',
-        'title'     => 'نمایش نویسنده پروژه',
-        'default'   => 1,
-        'label_on'  => 'فعال',
-        'label_off' => 'غیرفعال'
-    ]))->render();
-    echo '<hr>';
+    // رندر ماژول‌های متنی
+    foreach ([
+                 'content_tab_title',
+                 'order_form_tab_title'
+             ] as $module_id) {
+        (new Nader_Text(
+            $nader_settings_instance->get_registered_module_config($module_id)
+        ))->render();
+        echo '<hr>';
+    }
 
-    (new Nader_Toggle([
-        'name'    => 'project_views_button',
-        'title'   => 'نمایش بازدید پروژه',
-        'default' => 1
-    ]))->render();
-    echo '<hr>';
-
-    (new Nader_Toggle([
-        'name'    => 'project_comments_button',
-        'title'   => 'نمایش نظرات پروژه',
-        'default' => 1
-    ]))->render();
-    echo '<hr>';
-
-    // عنوان تب محتوا
-    (new Nader_Text([
-        'name'        => 'content_tab_title',
-        'title'       => 'عنوان بخش محتوا',
-        'placeholder' => 'عنوان دلخواه را وارد کنید',
-        'default'     => 'جزئیات پروژه'
-    ]))->render();
-    echo '<hr>';
-
-    // عنوان تب فرم سفارش
-    (new Nader_Text([
-        'name'        => 'order_form_tab_title',
-        'title'       => 'عنوان بخش سفارش',
-        'placeholder' => 'عنوان دلخواه را وارد کنید',
-        'default'     => 'سفارش پروژه'
-    ]))->render();
-    echo '<hr>';
-
-    // انتخاب فرم سفارش پروژه
-    (new Nader_Choose([
-        'name'        => 'project_order_form',
-        'title'       => 'فرم سفارش پروژه',
-        'description' => 'صفحه مربوط به فرم درخواست پروژه',
-        'multiple'    => false,
-        'query'       => [
-            'type'      => 'post',
-            'post_type' => 'elementor_library'
-        ],
-        'placeholder' => 'جستجوی فرم...'
-    ]))->render();
-
-    (new Nader_Repeater([
-        'name'        => 'project_custom_fields',
-        'type'        => 'repeater',
-        'title'       => 'زمینه های دلخواه پروژه',
-        'description' => 'زمینه های دلخواه پروژه ها را اینجا مدیریت کنید.',
-        'fields'      => [
-            [
-                'name'     => 'title',
-                'type'     => 'text',
-                'title'    => 'عنوان آیکون',
-                'required' => true
-            ],
-            [
-                'name'        => 'key',
-                'type'        => 'text',
-                'title'       => 'کلید شناسایی',
-                'pattern'     => '^[a-z0-9_]+$',
-                'required'    => true,
-                'description' => 'فقط حروف کوچک، اعداد و زیرخط مجاز است'
-            ],
-            [
-                'name'     => 'label',
-                'type'     => 'text',
-                'required' => true,
-                'title'    => 'برچسب نمایشی'
-            ],
-            [
-                'name'        => 'icon_code',
-                'type'        => 'textarea',
-                'title'       => 'کد آیکون',
-                'description' => 'کد SVG آیکون',
-                'required'    => true,
-                'rows'        => 3
-            ]
-        ]
-    ]))->render();
+    // رندر ماژول‌های خاص
+    (new Nader_Choose(
+        $nader_settings_instance->get_registered_module_config('project_order_form')
+    ))->render();
 
 }, 10, 1);

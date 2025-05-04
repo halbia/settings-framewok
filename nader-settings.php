@@ -604,8 +604,6 @@ final class Nader_Settings{
         return $this->registered_module_configs[$name] ?? null;
     }
 
-    // می‌توانید متدهای کمکی دیگر مورد نیاز را اینجا اضافه کنید.
 }
 
-// نمونه‌سازی کلاس اصلی پلاگین با فراخوانی متد singleton.
 Nader_Settings::instance();
