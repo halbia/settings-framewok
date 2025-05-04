@@ -73,15 +73,6 @@ $spacing-xl: 32px;
   max-width: calc(25% - 10px);
 }
 
-/* ریسپانسیو برای موبایل */
-@media (max-width: 768px) {
-  .half,
-  .third,
-  .quarter {
-	flex:      0 0 100%;
-	max-width: 100%;
-  }
-}
 
 @media (max-width: 1280px) {
   .quarter {
@@ -90,6 +81,20 @@ $spacing-xl: 32px;
   }
 }
 
+@media (max-width: 880px) {
+  .quarter {
+	flex:      0 0 100%;
+	max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .half,
+  .third {
+	flex:      0 0 100%;
+	max-width: 100%;
+  }
+}
 .nader-settings-wrap {
   display:        flex;
   flex-direction: column;

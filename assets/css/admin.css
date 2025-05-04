@@ -45,19 +45,23 @@
   max-width: calc(25% - 10px);
 }
 
-/* ریسپانسیو برای موبایل */
-@media (max-width: 768px) {
-  .half,
-  .third,
+@media (max-width: 1280px) {
+  .quarter {
+    flex: 0 0 48%;
+    max-width: 48%;
+  }
+}
+@media (max-width: 880px) {
   .quarter {
     flex: 0 0 100%;
     max-width: 100%;
   }
 }
-@media (max-width: 1280px) {
-  .quarter {
-    flex: 0 0 48%;
-    max-width: 48%;
+@media (max-width: 768px) {
+  .half,
+  .third {
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 }
 .nader-settings-wrap {
