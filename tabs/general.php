@@ -121,7 +121,7 @@ $social_platforms = [
 $nader_settings->register_module_config([
     'name'    => 'social_media_status',
     'type'    => 'toggle',
-    'title'   => 'وضعیت لیست شبکه‌های اجتماعی',
+    'title' => 'وضعیت شبکه‌های اجتماعی',
     'default' => 1
 ]);
 foreach ($social_platforms as $key => $title) {
@@ -140,12 +140,13 @@ foreach ($social_platforms as $key => $title) {
 $nader_settings->register_module_config([
     'name'   => 'search_keywords',
     'type'   => 'repeater',
+    'item_label'   => 'کلمه کلیدی',
     'title'  => 'کلمات کلیدی جستجو',
     'fields' => [
         [
             'name'  => 'keyword',
             'type'  => 'text',
-            'title' => 'کلمه کلیدی'
+            'title' => ''
         ]
     ]
 ]);
@@ -170,32 +171,73 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
         'igap' => 'آیگپ', 'soroushplus' => 'سروش پلاس', 'email' => 'ایمیل'
     ];
 
-    // بخش لودینگ
-    (new Nader_Toggle($nader_settings->get_registered_module_config('loading_status')))->render();
-    (new Nader_Select($nader_settings->get_registered_module_config('loading_type')))->render();
-    (new Nader_Image($nader_settings->get_registered_module_config('loading_logo')))->render();
-    (new Nader_Text($nader_settings->get_registered_module_config('loading_text')))->render();
-    echo '<hr>';
+    ?>
+    <div class="nader-fields-group">
+        <h4>لودینگ</h4>
+        <div class="row">
+            <div class="half">
+                <?php (new Nader_Toggle($nader_settings->get_registered_module_config('loading_status')))->render(); ?>
+            </div>
+            <div class="half">
+                <?php (new Nader_Select($nader_settings->get_registered_module_config('loading_type')))->render(); ?>
+            </div>
+            <div class="half">
+                <?php (new Nader_Image($nader_settings->get_registered_module_config('loading_logo')))->render(); ?>
+            </div>
+            <div class="half">
+                <?php (new Nader_Text($nader_settings->get_registered_module_config('loading_text')))->render(); ?>
+            </div>
+        </div>
+    </div>
 
-    // بخش دنبال کننده موس
-    (new Nader_Toggle($nader_settings->get_registered_module_config('mouse_follower_status')))->render();
-    (new Nader_Color($nader_settings->get_registered_module_config('mouse_follower_color')))->render();
-    echo '<hr>';
 
-    // بخش دکمه تماس
-    (new Nader_Toggle($nader_settings->get_registered_module_config('contact_button_status')))->render();
-    (new Nader_Text($nader_settings->get_registered_module_config('contact_button_title')))->render();
-    (new Nader_Text($nader_settings->get_registered_module_config('contact_button_url')))->render();
-    echo '<hr>';
+    <div class="nader-fields-group">
+        <h4>دنبال کننده موس</h4>
+        <div class="row">
+            <div class="half">
+                <?php (new Nader_Toggle($nader_settings->get_registered_module_config('mouse_follower_status')))->render(); ?>
+            </div>
+            <div class="half">
+                <?php (new Nader_Color($nader_settings->get_registered_module_config('mouse_follower_color')))->render(); ?>
+            </div>
+        </div>
+    </div>
 
-    // بخش شبکه‌های اجتماعی
-    (new Nader_Toggle($nader_settings->get_registered_module_config('social_media_status')))->render();
-    foreach ($social_platforms as $key => $title) {
-        (new Nader_Text($nader_settings->get_registered_module_config("social_{$key}")))->render();
-    }
-    echo '<hr>';
+    <div class="nader-fields-group">
+        <h4>دکمه تماس در هدر غیر المنتوری</h4>
+        <div class="row">
+            <div class="third">
+                <?php (new Nader_Toggle($nader_settings->get_registered_module_config('contact_button_status')))->render(); ?>
+            </div>
+            <div class="third">
+                <?php (new Nader_Text($nader_settings->get_registered_module_config('contact_button_title')))->render(); ?>
+            </div>
+            <div class="third">
+                <?php (new Nader_Text($nader_settings->get_registered_module_config('contact_button_url')))->render(); ?>
+            </div>
+        </div>
+    </div>
 
-    // بخش کلمات کلیدی
+    <div class="nader-fields-group">
+        <h4>شبکه های اجتماعی در منوی موبایل غیر المنتوری</h4>
+        <div class="row">
+            <div class="full">
+                <?php (new Nader_Toggle($nader_settings->get_registered_module_config('social_media_status')))->render(); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <?php foreach ($social_platforms as $key => $title) { ?>
+            <div class="quarter">
+                <?php (new Nader_Text($nader_settings->get_registered_module_config("social_{$key}")))->render(); ?>
+            </div>
+            <?php } ?>
+        </div>
+    </div>
+
+    <div style="margin-top: 28px">
+    </div>
+    <?php
     (new Nader_Repeater($nader_settings->get_registered_module_config('search_keywords')))->render();
 
 }, 10, 1);

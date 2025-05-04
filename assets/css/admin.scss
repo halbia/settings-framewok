@@ -47,8 +47,9 @@ $spacing-xl: 32px;
 .row {
   display:    flex;
   flex-wrap:  wrap;
-  gap: 20px; /* فاصله بین ستون‌ها */
+  gap:             10px;
   margin:     20px 0;
+  justify-content: space-between;
 }
 
 .full {
@@ -63,8 +64,8 @@ $spacing-xl: 32px;
 }
 
 .third {
-  flex:      0 0 calc(33% - 10px); /* یک سوم با احتساب gap */
-  max-width: calc(33% - 10px);
+  flex:      0 0 calc(32.5% - 10px); /* یک سوم با احتساب gap */
+  max-width: calc(32.5% - 10px);
 }
 
 .quarter {
@@ -79,6 +80,13 @@ $spacing-xl: 32px;
   .quarter {
 	flex:      0 0 100%;
 	max-width: 100%;
+  }
+}
+
+@media (max-width: 1280px) {
+  .quarter {
+	flex:      0 0 48%;
+	max-width: 48%;
   }
 }
 
@@ -188,9 +196,9 @@ $spacing-xl: 32px;
   .nader-field-label {
 	display: block;
 	font-weight: bold;
-	font-size:   12px;
+	font-size:   14px;
 	margin-bottom: $spacing-sm;
-	color:       $material-text-secondary;
+	color:       #222;
   }
 
   .required {
@@ -212,6 +220,11 @@ $spacing-xl: 32px;
 	font-size: 0.75rem;
 	display: none;
   }
+}
+
+.nader-fields-group .nader-field-wrapper .nader-field-label{
+color: $material-text-secondary;
+  font-size: 12px;
 }
 
 .nader-lang-field {

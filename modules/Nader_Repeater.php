@@ -8,6 +8,7 @@ class Nader_Repeater extends Nader_Module {
         $defaults = [
             'name'        => 'repeater_field',
             'title' => 'فیلد تکرار شونده',
+            'item_label' => '',
             'description' => '',
             'required'    => false,
             'default'     => [],
@@ -34,7 +35,11 @@ class Nader_Repeater extends Nader_Module {
                 <?php foreach ($items as $index => $item): ?>
                     <div class="repeater-item" data-index="<?php echo $index; ?>">
                         <div class="item-header">
-                            <span class="item-title">آیتم <?php echo $index + 1; ?></span>
+                            <?php if (!empty($this->args['item_label'])) { ?>
+                                <span class="item-title"><?php echo $this->args['item_label'] . ($index + 1); ?></span>
+                            <?php } else { ?>
+                                <span class="item-title">آیتم <?php echo $index + 1; ?></span>
+                            <?php } ?>
                             <div class="item-actions">
                                 <button type="button" class="move-up">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
