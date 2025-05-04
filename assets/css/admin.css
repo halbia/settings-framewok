@@ -197,7 +197,7 @@ textarea.nader-textarea-input,
   box-sizing: border-box;
   padding: 8px;
   margin: 0;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #eee;
   border-radius: 4px;
   background-color: #fff;
   color: #222;
@@ -444,7 +444,6 @@ textarea.nader-textarea-input {
 }
 .nader-toggle-switch input:checked + .slider::before {
   transform: translateX(30px);
-  background-color: #018786;
 }
 
 .nader-field-choose .select2-container {
@@ -652,6 +651,14 @@ hr {
   cursor: pointer;
   margin-top: 8px;
   border-radius: 4px;
+}
+
+.nader-field-wrapper select {
+  height: 46px;
+  font-size: 12px;
+  width: 100%;
+  max-width: 100%;
+  border-color: #eee;
 }
 
 /*# sourceMappingURL=admin.css.map */

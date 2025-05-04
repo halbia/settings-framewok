@@ -6,7 +6,6 @@
 
 if (!defined('ABSPATH'))
     exit; // اگر مستقیماً فراخوانی شده، خارج شو.
-return;
 
 if (!class_exists('Nader_Settings')) {
     error_log('Nader Settings: Nader_Settings class not found when loading general tab.');

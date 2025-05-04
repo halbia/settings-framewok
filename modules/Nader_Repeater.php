@@ -7,7 +7,7 @@ class Nader_Repeater extends Nader_Module {
     public function __construct(array $args = []) {
         $defaults = [
             'name'        => 'repeater_field',
-            'title'       => 'Repeater Field',
+            'title' => 'فیلد تکرار شونده',
             'description' => '',
             'required'    => false,
             'default'     => [],
@@ -65,13 +65,16 @@ class Nader_Repeater extends Nader_Module {
                                 $module_class = 'Nader_' . str_replace('-', '_', ucwords($field_config['type'], '-'));
                                 if (class_exists($module_class)) {
                                     $field_name = "{$name}[{$index}][{$field_config['name']}]";
-                                    $module = new $module_class([
-                                                                    'name'        => $field_name,
-                                                                    'title'       => $field_config['title'],
-                                                                    'description' => $field_config['description'] ?? '',
-                                                                    'default'     => $item[$field_config['name']] ?? null,
-                                                                    'multilang'   => false,
-                                                                ] + $field_config);
+                                    $module = new $module_class(
+                                        [
+                                            'name'        => $field_name,
+                                            'title'       => $field_config['title'],
+                                            'description' => $field_config['description'] ?? '',
+                                            'required'    => $field_config['required'] ?? false,
+                                            'default'     => $item[$field_config['name']] ?? null,
+                                            'multilang'   => false,
+                                        ]
+                                        + $field_config);
                                     $module->render();
                                 }
                             }

@@ -245,7 +245,7 @@ textarea.nader-textarea-input,
   box-sizing: border-box;
   padding: $spacing-sm;
   margin: 0;
-  border: 1px solid $material-border;
+  border: 1px solid #eee;
   border-radius: 4px;
   background-color: $material-surface;
   color: $material-text-primary;
@@ -484,7 +484,6 @@ textarea.nader-textarea-input {
 
   input:checked + .slider::before {
 	transform: translateX(30px);
-	background-color: $material-secondary-variant;
   }
 }
 
@@ -738,4 +737,12 @@ hr {
 	margin-top: $spacing-sm;
 	border-radius: $spacing-xs;
   }
+}
+
+.nader-field-wrapper select {
+  height:    46px;
+  font-size: 12px;
+  width:     100%;
+  max-width: 100%;
+  border-color: #eee;
 }

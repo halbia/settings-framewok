@@ -6,8 +6,6 @@
 if (!defined('ABSPATH'))
     exit;
 
-return;
-
 $nader_settings = Nader_Settings::instance();
 
 // ثبت تب
