@@ -13,31 +13,25 @@ $nader_settings->register_tab([
 $nader_settings->register_module_config([
     'name'        => 'disable_projects',
     'title'       => 'غیرفعال سازی پروژه‌ها',
-    'description' => 'غیرفعال سازی پست تایپ و تاکسونومی پروژه‌ها',
     'type'        => 'toggle',
-    'default'     => 0
 ]);
 
 $nader_settings->register_module_config([
     'name'        => 'project_slug',
     'title'       => 'Slug پروژه‌ها',
     'type'        => 'text',
-    'placeholder' => 'projects',
 ]);
 
 $nader_settings->register_module_config([
     'name'        => 'disable_teams',
     'title'       => 'غیرفعال سازی کارمندان',
-    'description' => 'غیرفعال سازی پست تایپ و تاکسونومی کارمندان',
     'type'        => 'toggle',
-    'default'     => 0
 ]);
 
 $nader_settings->register_module_config([
     'name'        => 'team_slug',
     'title'       => 'Slug کارمندان',
     'type'        => 'text',
-    'placeholder' => 'teams',
 ]);
 
 // رندر محتوای تب

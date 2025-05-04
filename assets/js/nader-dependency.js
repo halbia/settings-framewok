@@ -7,20 +7,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 let results = [];
 
                 rules.forEach(rule => {
-                    const field = document.querySelector(`[name="${rule.field}"]`);
-                    if (!field) return;
+                    const fields = document.querySelectorAll(`[name="${rule.field}"]`);
+                    let value;
 
-                    // دریافت مقدار فیلد با توجه به نوع آن
-                    let value = field.type === 'checkbox' ? field.checked : field.value;
+                    // حالت خاص برای رادیو باتن‌ها
+                    if (fields[0]?.type === 'radio') {
+                        const selected = Array.from(fields).find(f => f.checked);
+                        value = selected ? selected.value : null;
+                    } else {
+                        // برای سایر انواع فیلدها
+                        const field = fields[0];
+                        if (!field) return;
 
-                    // تبدیل نوع داده بر اساس مقدار rule
+                        value = field.type === 'checkbox' ? field.checked : field.value;
+                    }
+
+                    // تبدیل نوع داده
                     if (typeof rule.value === 'number') value = Number(value);
-                    if (typeof rule.value === 'boolean') value = Boolean(value);
+                    if (typeof rule.value === 'boolean') value = value === 'true' ? true : Boolean(value);
 
                     // بررسی عملگرها
                     switch(rule.operator) {
                         case '==': results.push(value == rule.value); break;
                         case '!=': results.push(value != rule.value); break;
+                        case '>':
+                            results.push(Number(value) > rule.value);
+                            break;
+                        case '>=':
+                            results.push(Number(value) >= rule.value);
+                            break;
+                        case '<':
+                            results.push(Number(value) < rule.value);
+                            break;
+                        case '<=':
+                            results.push(Number(value) <= rule.value);
+                            break;
+                        default:
+                            results.push(false);
                     }
                 });
 
@@ -38,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // رویدادهای تغییر مقدار
-    document.querySelectorAll('input, select').forEach(element => {
+    document.querySelectorAll('input, select, textarea').forEach(element => {
         element.addEventListener('change', checkDependencies);
     });
 

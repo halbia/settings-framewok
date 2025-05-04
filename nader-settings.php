@@ -362,7 +362,6 @@ final class Nader_Settings{
         $raw_data = $_POST['settings'] ?? '';
         parse_str($raw_data, $submitted_data);
 
-        // حذف فیلدهای سیستمی
         unset(
             $submitted_data['nader_nonce'],
             $submitted_data['_wp_http_referer'],
@@ -371,12 +370,18 @@ final class Nader_Settings{
 
         $processed_settings = [];
         $validation_errors = [];
-        $all_settings = get_option(self::$settings_key, []);
 
         foreach ($this->registered_module_configs as $module_name => $module_config) {
             try {
                 $module_type = $module_config['type'];
-                $module_class = 'Nader_' . str_replace('-', '_', ucwords($module_type, '-'));
+
+                // تشخیص کلاس ماژول
+                $text_types = ['text', 'url', 'tel', 'number', 'email'];
+                if(in_array($module_type, $text_types)) {
+                    $module_class = 'Nader_Text';
+                } else {
+                    $module_class = 'Nader_' . str_replace('-', '_', ucwords($module_type, '-'));
+                }
 
                 if (!class_exists($module_class) || !is_subclass_of($module_class, 'Nader_Module')) {
                     error_log("Nader Settings: Invalid module class for {$module_type}");
@@ -424,16 +429,11 @@ final class Nader_Settings{
             ], 400);
         }
 
-        //         اعتبارسنجی نهایی قبل از ذخیره
         if (!$this->validate_final_data($processed_settings)) {
             wp_send_json_error('داده‌های نامعتبر', 400);
         }
 
         update_option(self::$settings_key, $processed_settings);
-
-        // Log final data
-//        error_log('Nader Settings Final Saved Data: ' . print_r($updated_settings, true));
-
         wp_send_json_success('تنظیمات با موفقیت ذخیره شدند');
     }
 

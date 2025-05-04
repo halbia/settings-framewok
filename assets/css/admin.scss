@@ -25,6 +25,63 @@ $spacing-lg: 24px;
 $spacing-xl: 32px;
 
 
+.nader-fields-group {
+  padding:       20px;
+  background:    #fafafa;
+  border-radius: 4px;
+  border:        1px solid #eee;
+
+  & + .nader-fields-group {
+	margin-top: 8px;
+  }
+
+  h4 {
+	margin-top:     0;
+	color:          #222;
+	border-bottom:  1px solid #eee;
+	padding-bottom: 10px;
+  }
+}
+
+/* سیستم اصلی */
+.row {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap: 20px; /* فاصله بین ستون‌ها */
+  margin:     20px 0;
+}
+
+.full {
+  flex:      1 1 100%;
+  max-width: 100%;
+}
+
+/* اندازه ستون‌ها */
+.half {
+  flex:      0 0 calc(50% - 10px); /* نصف صفحه با احتساب gap */
+  max-width: calc(50% - 10px);
+}
+
+.third {
+  flex:      0 0 calc(33% - 10px); /* یک سوم با احتساب gap */
+  max-width: calc(33% - 10px);
+}
+
+.quarter {
+  flex:      0 0 calc(25% - 10px); /* یک چهارم با احتساب gap */
+  max-width: calc(25% - 10px);
+}
+
+/* ریسپانسیو برای موبایل */
+@media (max-width: 768px) {
+  .half,
+  .third,
+  .quarter {
+	flex:      0 0 100%;
+	max-width: 100%;
+  }
+}
+
 .nader-settings-wrap {
   display:        flex;
   flex-direction: column;
@@ -78,9 +135,9 @@ $spacing-xl: 32px;
 	padding:         .75rem 1rem;
 	cursor:          pointer;
 	border-bottom:   1px solid #eee;
-	transition:      background .2s;
 	margin-bottom:   0;
 	color:           $material-secondary-variant;
+	transition: all 0.3s ease;
 
 	&.active {
 	  background:  #fff;
@@ -89,6 +146,13 @@ $spacing-xl: 32px;
   }
 }
 
+.nader-tab-panel {
+  display: none;
+
+  &.active {
+	display: block;
+  }
+}
 
 .nader-notice-area {
   margin-top: $spacing-md;
@@ -123,9 +187,10 @@ $spacing-xl: 32px;
 
   .nader-field-label {
 	display: block;
-	font-weight:   bold;
+	font-weight: bold;
+	font-size:   12px;
 	margin-bottom: $spacing-sm;
-	color: $material-text-primary;
+	color:       $material-text-secondary;
   }
 
   .required {
@@ -153,7 +218,7 @@ $spacing-xl: 32px;
   border: 1px dashed $material-border;
   padding: $spacing-md;
   margin-bottom: $spacing-md;
-  background: rgba($material-primary, 0.04);
+  background: #fafafa;
   border-radius: 4px;
 
   &.has-error {
@@ -172,6 +237,7 @@ input[type="text"],
 input[type="number"],
 input[type="email"],
 input[type="url"],
+input[type="tel"],
 input[type="password"],
 textarea.nader-textarea-input,
 .nader-text-input {
@@ -573,8 +639,10 @@ hr {
 
 .nader-field-repeater {
   .repeater-item {
-	padding:    10px;
-	background: #f8f8f8;
+	padding:       10px;
+	background:    #fafafa;
+	border:        1px solid #eee;
+	border-radius: 4px;
 
 	.item-header {
 	  display:         flex;
@@ -603,6 +671,7 @@ hr {
 		padding:         0;
 		border:          none;
 		background:      transparent;
+		border-radius: 4px;
 
 		svg {
 		  width: 16px;
@@ -669,19 +738,4 @@ hr {
 	margin-top: $spacing-sm;
 	border-radius: $spacing-xs;
   }
-}
-
-/* مخفی کردن تب‌های غیرفعال */
-.nader-tab-panel {
-  display: none;
-}
-
-.nader-tab-panel.active {
-  display: block;
-}
-
-/* استایل ناوبری تب‌ها */
-.nader-tabs-nav a {
-  cursor:     pointer;
-  transition: all 0.3s ease;
 }

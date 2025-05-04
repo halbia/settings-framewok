@@ -150,7 +150,7 @@ jQuery(document).ready(function($) {
                 settings: formData
             },
             success: function(response) {
-                console.log('پاسخ موفقیت:', response);
+                // console.log('پاسخ موفقیت:', response);
                 showNotice('success', naderSettings.save_success_message);
                 $saveButton.text(naderSettings.saved_text);
                 setTimeout(() => { $saveButton.text(naderSettings.save_text); }, 2000);

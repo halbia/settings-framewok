@@ -49,12 +49,7 @@ $nader_settings->register_module_config([
 // نمونه Nader_Image
 $nader_settings->register_module_config([
     'name'        => 'demo_image',
-    'title'       => 'فیلد آپلود تصویر',
-    'description' => 'نمونه‌ای از ماژول Nader_Image برای انتخاب یک تصویر.',
-    'required'    => false,
-    'multilang'   => false,
     'type'        => 'image',
-    'button_text' => 'انتخاب تصویر',
 ]);
 
 // نمونه Nader_Gallery (چند زبانه)
@@ -263,7 +258,6 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
         return;
     }
 
-    // رندر هر نمونه ماژول
 
     // Nader_Text (تک زبانه)
     $text_single_field = new Nader_Text([
@@ -293,6 +287,8 @@ add_action('nader_settings_tab_general', function($nader_settings_instance) {
         'title'       => 'فیلد آپلود تصویر',
         'description' => 'نمونه‌ای از ماژول Nader_Image برای انتخاب یک تصویر.',
         'button_text' => 'انتخاب تصویر نمونه',
+        'required'  => false,
+        'multilang' => false,
     ]);
     $image_field->render();
     echo '<hr>'; // جداکننده

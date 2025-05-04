@@ -1,4 +1,58 @@
 @charset "UTF-8";
+.nader-fields-group {
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+.nader-fields-group + .nader-fields-group {
+  margin-top: 8px;
+}
+.nader-fields-group h4 {
+  margin-top: 0;
+  color: #222;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* سیستم اصلی */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* فاصله بین ستون‌ها */
+  margin: 20px 0;
+}
+
+.full {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+/* اندازه ستون‌ها */
+.half {
+  flex: 0 0 calc(50% - 10px); /* نصف صفحه با احتساب gap */
+  max-width: calc(50% - 10px);
+}
+
+.third {
+  flex: 0 0 calc(33% - 10px); /* یک سوم با احتساب gap */
+  max-width: calc(33% - 10px);
+}
+
+.quarter {
+  flex: 0 0 calc(25% - 10px); /* یک چهارم با احتساب gap */
+  max-width: calc(25% - 10px);
+}
+
+/* ریسپانسیو برای موبایل */
+@media (max-width: 768px) {
+  .half,
+  .third,
+  .quarter {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
 .nader-settings-wrap {
   display: flex;
   flex-direction: column;
@@ -48,13 +102,20 @@
   padding: 0.75rem 1rem;
   cursor: pointer;
   border-bottom: 1px solid #eee;
-  transition: background 0.2s;
   margin-bottom: 0;
   color: #018786;
+  transition: all 0.3s ease;
 }
 .nader-tabs-nav a.active {
   background: #fff;
   font-weight: bold;
+}
+
+.nader-tab-panel {
+  display: none;
+}
+.nader-tab-panel.active {
+  display: block;
 }
 
 .nader-notice-area {
@@ -85,8 +146,9 @@
 .nader-field-wrapper .nader-field-label {
   display: block;
   font-weight: bold;
+  font-size: 12px;
   margin-bottom: 8px;
-  color: #222;
+  color: #666;
 }
 .nader-field-wrapper .required {
   color: #b00020;
@@ -110,7 +172,7 @@
   border: 1px dashed #f0f0f0;
   padding: 16px;
   margin-bottom: 16px;
-  background: rgba(98, 0, 238, 0.04);
+  background: #fafafa;
   border-radius: 4px;
 }
 .nader-lang-field.has-error {
@@ -127,6 +189,7 @@ input[type=text],
 input[type=number],
 input[type=email],
 input[type=url],
+input[type=tel],
 input[type=password],
 textarea.nader-textarea-input,
 .nader-text-input {
@@ -146,6 +209,7 @@ input[type=text]:focus,
 input[type=number]:focus,
 input[type=email]:focus,
 input[type=url]:focus,
+input[type=tel]:focus,
 input[type=password]:focus,
 textarea.nader-textarea-input:focus,
 .nader-text-input:focus {
@@ -157,6 +221,7 @@ input[type=text].has-error,
 input[type=number].has-error,
 input[type=email].has-error,
 input[type=url].has-error,
+input[type=tel].has-error,
 input[type=password].has-error,
 textarea.nader-textarea-input.has-error,
 .nader-text-input.has-error {
@@ -167,6 +232,7 @@ input[type=text][readonly],
 input[type=number][readonly],
 input[type=email][readonly],
 input[type=url][readonly],
+input[type=tel][readonly],
 input[type=password][readonly],
 textarea.nader-textarea-input[readonly],
 .nader-text-input[readonly] {
@@ -177,6 +243,7 @@ input[type=text]:disabled,
 input[type=number]:disabled,
 input[type=email]:disabled,
 input[type=url]:disabled,
+input[type=tel]:disabled,
 input[type=password]:disabled,
 textarea.nader-textarea-input:disabled,
 .nader-text-input:disabled {
@@ -505,7 +572,9 @@ hr {
 
 .nader-field-repeater .repeater-item {
   padding: 10px;
-  background: #f8f8f8;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 4px;
 }
 .nader-field-repeater .repeater-item .item-header {
   display: flex;
@@ -532,6 +601,7 @@ hr {
   padding: 0;
   border: none;
   background: transparent;
+  border-radius: 4px;
 }
 .nader-field-repeater .repeater-item .item-header button svg {
   width: 16px;
@@ -582,21 +652,6 @@ hr {
   cursor: pointer;
   margin-top: 8px;
   border-radius: 4px;
-}
-
-/* مخفی کردن تب‌های غیرفعال */
-.nader-tab-panel {
-  display: none;
-}
-
-.nader-tab-panel.active {
-  display: block;
-}
-
-/* استایل ناوبری تب‌ها */
-.nader-tabs-nav a {
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 /*# sourceMappingURL=admin.css.map */
