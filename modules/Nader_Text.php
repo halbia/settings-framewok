@@ -94,6 +94,10 @@ class Nader_Text extends Nader_Module {
             return $errors;
         }
 
+        if (empty($value_str)) {
+            return $errors;
+        }
+
         // اعتبارسنجی نوع ورودی
         switch ($input_type) {
 

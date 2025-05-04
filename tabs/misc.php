@@ -1,6 +1,7 @@
 <?php
 if (!defined('ABSPATH'))
     exit;
+return;
 
 // ثبت تب متفرقه
 $nader_settings->register_tab([
