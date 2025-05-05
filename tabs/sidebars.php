@@ -12,7 +12,7 @@ $nader_settings = Nader_Settings::instance();
 $nader_settings->register_tab([
     'id'    => 'sidebars',
     'title' => 'سایدبارها',
-    'order' => 5
+    'order' => 25
 ]);
 
 // ثبت ماژول‌های سایدبار
@@ -31,7 +31,7 @@ foreach ($sidebars as $key => $title) {
         'type'        => 'toggle',
         'title'       => $title,
         'description' => 'فعال/غیرفعال کردن ' . $title,
-        'default'     => 0,
+        'default'     => 1,
         'label_on'    => 'فعال',
         'label_off'   => 'غیرفعال'
     ]);
@@ -54,15 +54,7 @@ add_action('nader_settings_tab_sidebars', function($nader_settings_instance) {
     ];
 
     foreach ($sidebars as $key => $title) {
-        $field = new Nader_Toggle([
-            'name'        => 'sidebar_' . $key,
-            'title'       => $title,
-            'description' => 'وضعیت نمایش ' . $title,
-            'label_on'    => 'فعال',
-            'label_off'   => 'غیرفعال'
-        ]);
-
-        $field->render();
+        (new Nader_Toggle($nader_settings_instance->get_registered_module_config('sidebar_' . $key)))->render();
         echo '<hr>';
     }
 }, 10, 1);

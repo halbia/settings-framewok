@@ -16,6 +16,7 @@ final class Nader_Settings{
     private static $instance;
 
     public static $settings_key = 'nader_settings'; // کلید ذخیره‌سازی تنظیمات در wp_options
+    public static $settings_menu_key = 'nader-settings'; // کلید ذخیره‌سازی تنظیمات در wp_options
     private $settings_data = [];                    // کش برای نگهداری تنظیمات بارگذاری شده
     private $loaded_module_classes = [];            // نگهداری لیست نام کلاس‌های ماژول بارگذاری شده
     private $registered_module_configs = [];        // <-- جدید: نگهداری پیکربندی‌های ماژول ثبت شده از تب‌ها
@@ -212,9 +213,9 @@ final class Nader_Settings{
             'تنظیمات نادر',                  // عنوان صفحه در <title>
             'تنظیمات نادر',                  // متن منو در نوار کناری
             'manage_options',                // قابلیت مورد نیاز برای دسترسی
-            'nader-settings',                // شناسه منحصر به فرد منو
+            self::$settings_menu_key,                // شناسه منحصر به فرد منو
             [$this, 'render_settings_page'], // تابع کال‌بک برای نمایش محتوای صفحه
-            'dashicons-admin-settings',      // کلاس آیکون Dashicons
+            'dashicons-admin-generic',      // کلاس آیکون Dashicons
             80 // موقعیت در ترتیب منو
         );
     }
@@ -229,7 +230,7 @@ final class Nader_Settings{
     public function enqueue_assets($hook) {
         // فقط در صفحه تنظیمات افزونه دارایی‌ها را بارگذاری کن
         // 'toplevel_page_nader-settings' نام صفحه تنظیمات ما است که هنگام add_menu_page تعریف شد.
-        if ($hook !== 'toplevel_page_nader-settings') {
+        if ($hook !== 'toplevel_page_' . self::$settings_menu_key) {
             return;
         }
 

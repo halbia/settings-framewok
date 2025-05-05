@@ -215,4 +215,10 @@ add_action('nader_settings_tab_shop', function($nader_settings_instance) {
 
     (new Nader_Choose($nader_settings_instance->get_registered_module_config('comparison_page')))->render();
 
+    ?>
+
+    <button class="nader-settings-ajax-create-compare-products-page button button-secondary" type="button" style="margin-top: 8px">ساخت خودکار برگه مقایسه</button>
+
+    <?php
+
 }, 10, 1);
