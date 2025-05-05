@@ -29,7 +29,11 @@ $nader_settings->register_module_config([
     'title'       => 'حذف در موبایل',
     'type'        => 'toggle',
     'description' => 'برای اندازه های زیر 768px اعمال می شود',
-    'default'     => 0
+    'default'      => 0,
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 // --- بخش سبد خرید ---
@@ -44,12 +48,20 @@ $nader_settings->register_module_config([
     'name'  => 'corner_buttons_cart_button_bg',
     'title' => 'بکگراند',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_cart_button_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 $nader_settings->register_module_config([
     'name'  => 'corner_buttons_cart_icon_color',
     'title' => 'رنگ آیکون',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_cart_button_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 // --- بخش جستجو ---
@@ -64,12 +76,20 @@ $nader_settings->register_module_config([
     'name'  => 'corner_buttons_search_button_bg',
     'title' => 'بکگرند',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_search_button_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 $nader_settings->register_module_config([
     'name'  => 'corner_buttons_search_icon_color',
     'title' => 'رنگ آیکون',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_search_button_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 // --- بخش خروج ---
@@ -84,12 +104,20 @@ $nader_settings->register_module_config([
     'name'  => 'corner_buttons_logout_button_bg',
     'title' => 'بکگراند',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_logout_button_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 $nader_settings->register_module_config([
     'name'  => 'corner_buttons_logout_icon_color',
     'title' => 'رنگ آیکون',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_logout_button_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 // --- بخش بالابر ---
@@ -109,19 +137,31 @@ $nader_settings->register_module_config([
         'simple' => 'ساده',
         'linear' => 'خطی',
     ],
-    'default' => 'simple'
+    'default' => 'simple',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_scrolltop_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 $nader_settings->register_module_config([
     'name'  => 'corner_buttons_scrolltop_button_bg',
     'title' => 'بکگراند',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_scrolltop_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 $nader_settings->register_module_config([
     'name'  => 'corner_buttons_scrolltop_icon_color',
     'title' => 'رنگ آیکون',
     'type'    => 'color',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_scrolltop_status', 'operator' => '==', 'value' => '1']]
+    ]
 ]);
 
 // --- بخش دکمه های دلخواه ---
@@ -141,7 +181,11 @@ $nader_settings->register_module_config([
     'name' => 'corner_buttons_custom_buttons_popup_title',
     'title'       => 'عنوان باکس پاپ آپ',
     'type'        => 'text',
-    'placeholder' => 'دکمه های سریع'
+    'placeholder' => 'دکمه های سریع',
+    'dependencies' => [
+        'relation' => 'AND',
+        'rules'    => [['field' => 'corner_buttons_custom_buttons_style', 'operator' => '==', 'value' => 'popup']]
+    ]
 ]);
 
 // --- بخش تکرارشونده ---
@@ -166,7 +210,8 @@ $nader_settings->register_module_config([
         [
             'name'        => 'icon',
             'title'       => 'آیکون',
-            'type'        => 'text',
+            'type'        => 'textarea',
+            'rows'  =>  3
         ],
         [
             'name'    => 'button_color',
@@ -265,11 +310,21 @@ add_action('nader_settings_tab_corner_buttons', function($nader_settings) {
             </div>
         </div>
         <div class="row">
-            <div class="full">
+            <div class="full corner-buttons-custom-button">
                 <?php (new Nader_Repeater($nader_settings->get_registered_module_config('corner_buttons_custom_buttons')))->render(); ?>
             </div>
         </div>
     </div>
+
+    <style>
+        .corner-buttons-custom-button .repeater-item{
+            background: #fff;
+        }
+
+        .corner-buttons-custom-button .repeater-item input[type=text],.corner-buttons-custom-button .repeater-item textarea{
+            background: #eee;
+        }
+    </style>
 
     <?php
 });

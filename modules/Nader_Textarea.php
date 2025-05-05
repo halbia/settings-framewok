@@ -90,6 +90,6 @@ class Nader_Textarea extends Nader_Module {
      */
     protected function sanitize_value($value) {
         // استفاده از sanitize_textarea_field برای متن‌های چند خطی
-        return sanitize_textarea_field((string) $value);
+        return (string) $value;
     }
 }
