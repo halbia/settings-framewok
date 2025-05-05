@@ -129,8 +129,9 @@ add_action('nader_settings_tab_login_register', function($nader_settings) {
         $ajax_login->render();
         ?>
 
+        <hr>
 
-        <div class="nader-fields-group" style="margin-top: 28px">
+        <div class="nader-fields-group">
             <h4>دکمه گوشه ای ورود/عضویت</h4>
             <div class="row">
                 <div class="third">
@@ -154,6 +155,7 @@ add_action('nader_settings_tab_login_register', function($nader_settings) {
             </div>
         </div>
 
+        <hr>
 
         <!-- ریدایرکت‌ها -->
         <div class="nader-fields-group">
@@ -174,6 +176,8 @@ add_action('nader_settings_tab_login_register', function($nader_settings) {
             </div>
         </div>
 
+        <hr>
+
         <!-- متون فرم -->
         <div class="nader-fields-group">
             <h4>متون فرم ورود</h4>
@@ -192,6 +196,8 @@ add_action('nader_settings_tab_login_register', function($nader_settings) {
                 </div>
             </div>
         </div>
+
+        <hr>
 
         <!-- ورود با موبایل -->
         <div class="nader-fields-group">

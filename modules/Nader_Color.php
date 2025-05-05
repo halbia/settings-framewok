@@ -41,9 +41,6 @@ class Nader_Color extends Nader_Module {
             'id'          => esc_attr($name),
             'value'       => $current_value,
             'class'       => esc_attr('nader-text-input ' . $this->args['class']), // کلاس CSS ماژول + کلاس مخصوص Color Picker وردپرس
-            'data-alpha'  => $this->args['enable_alpha'] ? 'true' : 'false', // ویژگی داده برای فعال کردن شفافیت در JS وردپرس
-            'data-palettes' => $this->args['palettes'] ? 'true' : 'false', // ویژگی داده برای نمایش پالت
-            'dir'         => 'ltr', // جهت چپ به راست برای کدهای رنگ
         ];
 
         if ($this->is_required()) {

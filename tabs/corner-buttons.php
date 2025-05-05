@@ -237,6 +237,7 @@ add_action('nader_settings_tab_corner_buttons', function($nader_settings) {
         </div>
     </div>
 
+    <hr>
 
     <div class="nader-fields-group">
         <h4>دکمه سبد خرید</h4>
@@ -251,6 +252,7 @@ add_action('nader_settings_tab_corner_buttons', function($nader_settings) {
         </div>
     </div>
 
+    <hr>
 
     <div class="nader-fields-group">
         <h4>دکمه جستجو</h4>
@@ -265,6 +267,7 @@ add_action('nader_settings_tab_corner_buttons', function($nader_settings) {
         </div>
     </div>
 
+    <hr>
 
     <div class="nader-fields-group">
         <h4>دکمه خروج</h4>
@@ -279,6 +282,7 @@ add_action('nader_settings_tab_corner_buttons', function($nader_settings) {
         </div>
     </div>
 
+    <hr>
 
     <div class="nader-fields-group">
         <h4>دکمه بالابر</h4>
@@ -298,6 +302,7 @@ add_action('nader_settings_tab_corner_buttons', function($nader_settings) {
         </div>
     </div>
 
+    <hr>
 
     <div class="nader-fields-group">
         <h4>دکمه های سفارشی</h4>
