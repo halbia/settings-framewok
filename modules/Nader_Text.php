@@ -26,7 +26,7 @@ class Nader_Text extends Nader_Module {
             'type'         => 'text', // انواع: text, url, tel, number, email
             'min'          => '',     // برای نوع number
             'max'          => '',     // برای نوع number
-            'step'         => 'any'   // برای نوع number
+            'step' => 1   // برای نوع number
         ];
 
         parent::__construct(wp_parse_args($args, $default_args));
