@@ -213,6 +213,7 @@ $spacing-xl: 32px;
 
   .description {
 	margin-top: $spacing-xs;
+	margin-bottom: $spacing-md;
 	font-size: 12px;
 	color: $material-text-secondary;
   }
@@ -377,24 +378,24 @@ textarea.nader-textarea-input {
 }
 
 
-.nader-radio-field,
-.nader-checkbox-field {
-  .inline-options {
-	label {
-	  margin-right: $spacing-md;
-	  margin-left: 0;
-	  display: inline-block;
-	}
+.nader-field-radio,
+.nader-field-checkbox {
+  input {
+	margin-top: 0;
   }
 
-  label {
-	display: block;
-	margin-bottom: $spacing-xs;
+  .nader-radio-block,
+  .nader-checkbox-block {
+	display:        flex;
+	flex-direction: column;
+	gap:            8px;
+  }
 
-	input {
-	  margin-left: $spacing-xs;
-	  margin-right: 0;
-	}
+  .nader-radio-inline,
+  .nader-checkbox-inline {
+	display: flex;
+	gap:     20px;
+	align-items: center;
   }
 }
 

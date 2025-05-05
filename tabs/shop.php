@@ -69,6 +69,7 @@ $nader_settings->register_module_config([
 $nader_settings->register_module_config([
     'name'    => 'empty_price_behavior',
     'type'    => 'radio',
+    'inline' => true,
     'title'   => 'رفتار با محصولات بدون قیمت',
     'description' => 'فقط برای محصولاتی که قیمت آنها خالی است.',
     'options' => [
@@ -161,7 +162,6 @@ $nader_settings->register_module_config([
 
 add_action('nader_settings_tab_shop', function($nader_settings_instance) {
 
-
     ?>
 
     <div class="nader-fields-group">
@@ -185,7 +185,6 @@ add_action('nader_settings_tab_shop', function($nader_settings_instance) {
             </div>
         </div>
     </div>
-
 
     <?php
     echo '<hr/>';

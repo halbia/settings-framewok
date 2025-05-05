@@ -167,6 +167,7 @@
 }
 .nader-field-wrapper .description {
   margin-top: 4px;
+  margin-bottom: 16px;
   font-size: 12px;
   color: #666;
 }
@@ -350,21 +351,25 @@ textarea.nader-textarea-input {
   margin-top: 8px;
 }
 
-.nader-radio-field .inline-options label,
-.nader-checkbox-field .inline-options label {
-  margin-right: 16px;
-  margin-left: 0;
-  display: inline-block;
+.nader-field-radio input,
+.nader-field-checkbox input {
+  margin-top: 0;
 }
-.nader-radio-field label,
-.nader-checkbox-field label {
-  display: block;
-  margin-bottom: 4px;
+.nader-field-radio .nader-radio-block,
+.nader-field-radio .nader-checkbox-block,
+.nader-field-checkbox .nader-radio-block,
+.nader-field-checkbox .nader-checkbox-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.nader-radio-field label input,
-.nader-checkbox-field label input {
-  margin-left: 4px;
-  margin-right: 0;
+.nader-field-radio .nader-radio-inline,
+.nader-field-radio .nader-checkbox-inline,
+.nader-field-checkbox .nader-radio-inline,
+.nader-field-checkbox .nader-checkbox-inline {
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .nader-range-slider-field {
