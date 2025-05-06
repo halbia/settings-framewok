@@ -117,11 +117,12 @@
   cursor: pointer;
   border-bottom: 1px solid #eee;
   margin-bottom: 0;
-  color: #018786;
+  color: #6c491a;
   transition: all 0.3s ease;
 }
 .nader-tabs-nav a.active {
-  background: #fff;
+  background: #D79D4B;
+  color: white;
   font-weight: bold;
 }
 
@@ -136,7 +137,7 @@
   margin-top: 16px;
 }
 .nader-notice-area .notice {
-  border-right-color: #6200ee;
+  border-right-color: #D79D4B;
 }
 .nader-notice-area .notice.notice-error {
   border-right-color: #b00020;
@@ -234,8 +235,8 @@ input[type=tel]:focus,
 input[type=password]:focus,
 textarea.nader-textarea-input:focus,
 .nader-text-input:focus {
-  border-color: #6200ee;
-  box-shadow: 0 0 0 1px #6200ee;
+  border-color: #D79D4B;
+  box-shadow: 0 0 0 1px #D79D4B;
   outline: none;
 }
 input[type=text].has-error,
@@ -405,11 +406,11 @@ textarea.nader-textarea-input {
   cursor: pointer;
 }
 .nader-image-select-list .image-option.selected {
-  border-color: #6200ee;
-  box-shadow: 0 0 0 1px #6200ee;
+  border-color: #D79D4B;
+  box-shadow: 0 0 0 1px #D79D4B;
 }
 .nader-image-select-list .image-option:hover {
-  border-color: rgba(98, 0, 238, 0.6);
+  border-color: rgba(215, 157, 75, 0.6);
 }
 .nader-image-select-list .image-option img {
   width: 100%;
@@ -465,7 +466,7 @@ textarea.nader-textarea-input {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 .nader-toggle-switch input:checked + .slider {
-  background-color: #03dac6;
+  background-color: #D79D4B;
 }
 .nader-toggle-switch input:checked + .slider::before {
   transform: translateX(30px);
@@ -520,7 +521,7 @@ textarea.nader-textarea-input {
   color: #666;
 }
 .nader-field-choose .select2-container .select2-selection--multiple .select2-selection__choice {
-  background-color: rgba(98, 0, 238, 0.08);
+  background-color: rgba(215, 157, 75, 0.08);
   border: none;
   border-radius: 4px;
   padding: 4px 8px;
@@ -536,8 +537,8 @@ textarea.nader-textarea-input {
 }
 .nader-field-choose .select2-container.select2-container--focus .select2-selection--single,
 .nader-field-choose .select2-container.select2-container--focus .select2-selection--multiple {
-  border-color: #6200ee;
-  box-shadow: 0 0 0 1px #6200ee;
+  border-color: #D79D4B;
+  box-shadow: 0 0 0 1px #D79D4B;
   outline: none;
 }
 .nader-field-choose .select2-container.has-error-select2 .select2-selection {
@@ -631,7 +632,7 @@ hr {
   width: 16px;
 }
 .nader-field-repeater .repeater-item .item-header button:hover {
-  background: #03dac6;
+  background: #D79D4B;
 }
 .nader-field-repeater .repeater-item .item-header button:hover svg {
   fill: white;

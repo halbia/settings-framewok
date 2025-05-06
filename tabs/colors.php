@@ -12,7 +12,7 @@ $nader_settings = Nader_Settings::instance();
 $nader_settings->register_tab([
     'id'    => 'non_elementor_colors',
     'title' => 'رنگ بندی بخش های غیر المنتوری',
-    'order' => 40
+    'order' => 45
 ]);
 
 // ثبت تمام فیلدهای رنگ

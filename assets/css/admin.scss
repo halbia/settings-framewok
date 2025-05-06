@@ -1,7 +1,7 @@
 // Material-like Color Palette
-$material-primary: #6200ee;
+$material-primary: #D79D4B;
 $material-primary-variant: #3700b3;
-$material-secondary: #03dac6;
+$material-secondary: #D79D4B;
 $material-text-primary: #222;
 $material-text-secondary: #666;
 $material-secondary-variant: #018786;
@@ -153,11 +153,12 @@ $spacing-xl: 32px;
 	cursor:          pointer;
 	border-bottom:   1px solid #eee;
 	margin-bottom:   0;
-	color:           $material-secondary-variant;
-	transition: all 0.3s ease;
+	color:           #6c491a;
+	transition:      all 0.3s ease;
 
 	&.active {
-	  background:  #fff;
+	  background:  #D79D4B;
+	  color: white;
 	  font-weight: bold;
 	}
   }

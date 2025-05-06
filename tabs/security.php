@@ -11,7 +11,7 @@ $nader_settings = Nader_Settings::instance();
 $nader_settings->register_tab([
     'id'    => 'security',
     'title' => 'تنظیمات امنیتی',
-    'order' => 45
+    'order' => 40
 ]);
 
 // ثبت پیکربندی ماژول‌ها
